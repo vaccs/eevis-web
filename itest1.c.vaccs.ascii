@@ -1,0 +1,20 @@
+architecture~!~x86_64
+equation~!~s = (i + 1)
+var_decl_node~!~i|signed int|-2147483648
+var_decl_node~!~s|signed short|<NOVALUE>
+ast_node~!~13|0|2|[14, 15]|3| = |1|[4]
+ast_node~!~15|13|2|[16, 17]|3| + |2|[2, 3]
+ast_node~!~16|15|0|[]|3|i|0|[]
+ast_node~!~17|15|0|[]|3|1|1|[1]
+ast_node~!~14|13|0|[]|3|s|0|[]
+traversal~!~[16,17,15,14,13]
+assembly~!~1|17|%t0 = 1|-1|int|[int]
+assembly~!~2|15|%t1 = i + %t0|-1|int|[int, int]
+assembly~!~3|15|%t2 = %t1|-1|short|[int]
+assembly~!~4|13|s = %t2|-1|short|[short]
+function_invocation~!~1|0|itest1.c`main|1
+return_address~!~main|0|0
+variable_access~!~2|17|1|int|%t0|1
+variable_access~!~3|15|2|int|%t1|-2147483647
+variable_access~!~4|15|3|short|%t2|1
+variable_access~!~5|13|4|short|s|1
