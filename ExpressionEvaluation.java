@@ -114,6 +114,7 @@ public class ExpressionEvaluation {
         variableAccesses.add(va);
       }
       else if (type.equals("equation")) equation = parameters[0];
+      else if (type.equals("error")) equation = parameters[1];
       
     } // end loop through records
     
@@ -177,7 +178,7 @@ public class ExpressionEvaluation {
       }
     }
     
-    print(); // TODO: DEBUG
+//    print();
 
   } // parseEvaluation()
   

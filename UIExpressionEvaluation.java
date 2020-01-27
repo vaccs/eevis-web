@@ -2,6 +2,7 @@ import java.io.*;
 import java.util.*;
 import javafx.application.Application;
 import javafx.beans.value.*;
+import javafx.collections.*;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.layout.*;
@@ -23,6 +24,9 @@ public class UIExpressionEvaluation extends Application {
   Label lblEquation;
   GridPane tblVariables = new GridPane();
   GridPane tblEvaluation = new GridPane();
+  VBox boxBuildEquation = new VBox();
+  GridPane buildEquationContainer = new GridPane();
+  TextField txtEquation;
  
   public static void main(String[] args) {
     launch(args);
@@ -81,9 +85,45 @@ public class UIExpressionEvaluation extends Application {
     subLayout.add(btnLoad, 1, 0, 1, 1);
     subLayout.setPadding(new Insets(10, 10, 10, 10));
     
-    parseEvaluation("test1.c.vaccs.ascii");
+    boxBuildEquation = new VBox();
+    Label lblBuild1 = new Label("Create Custom Equation");
+    lblBuild1.setStyle("-fx-font-size: 16; -fx-font-weight: bold;");
     
-    // display
+    Button btnAddVariable = new Button("Add Variable");
+    btnAddVariable.setStyle("-fx-font-size: 16;");
+    btnAddVariable.setOnAction(e -> {
+      HBox row = createBuildVariableRow();
+      if (row != null) boxBuildEquation.getChildren().add(row);
+    });
+    
+    Button btnClear = new Button("Clear");
+    btnClear.setStyle("-fx-font-size: 16;");
+    btnClear.setOnAction(e -> {
+      boxBuildEquation.getChildren().clear();
+      createdVariables = 0;
+      customVariables.clear();
+    });
+    
+    Button btnEvaluate = new Button("Evaluate");
+    btnEvaluate.setStyle("-fx-font-size: 16;");
+    btnEvaluate.setOnAction(e -> {
+      runCustomAnalysis();
+    });
+    
+    txtEquation = new TextField("Enter Equation (e.g. A = B + C)");
+    
+    buildEquationContainer.setPadding(new Insets(10, 10, 10, 10));
+    buildEquationContainer.add(lblBuild1,        0, 0, 3, 1);
+    buildEquationContainer.add(btnAddVariable,   0, 1, 1, 1);
+    buildEquationContainer.add(btnClear,         1, 1, 1, 1);
+    buildEquationContainer.add(btnEvaluate,      2, 1, 1, 1);
+    buildEquationContainer.add(txtEquation,      0, 2, 3, 1);
+    buildEquationContainer.add(boxBuildEquation, 0, 3, 3, 5);
+    
+    
+    parseEvaluation("examples/test1.c.vaccs.ascii");
+    
+    // display /////////////////////////////////////////////////////////////////////////////////////
     GridPane layout = new GridPane();
 
     // no effect?
@@ -93,10 +133,11 @@ public class UIExpressionEvaluation extends Application {
     rightCol.setPercentWidth(60);
     layout.getColumnConstraints().addAll(leftCol, rightCol); /* */
 
-    layout.add(subLayout,     0, 0, 1, 1);
-    layout.add(imv,           1, 0, 1, 2);
-    layout.add(tblVariables,  0, 1, 1, 1);
-    layout.add(tblEvaluation, 0, 2, 2, 1);
+    layout.add(subLayout,               0, 0, 1, 1);
+    layout.add(imv,                     1, 0, 1, 4);
+    layout.add(tblVariables,            0, 1, 1, 1);
+    layout.add(buildEquationContainer,  0, 2, 1, 1);
+    layout.add(tblEvaluation,           0, 4, 2, 1);
     
     primaryStage.widthProperty().addListener(new ChangeListener<Number>() {
       public void changed(ObservableValue<? extends Number> obs, Number oldWidth, Number newWidth) {
@@ -192,11 +233,11 @@ public class UIExpressionEvaluation extends Application {
     Label colValues =  new Label("Initial Values");
     colValues.setStyle("-fx-font-weight: bold; -fx-font-size: 16;");
     tblEvaluation.add(createCell(colOperation, "#558866", "#aaddbb", ""), 0, 0, 1, 1);
-    tblEvaluation.add(createCell(colLhsType, "#558866", "#aaddbb", ""), 1, 0, 1, 1);
-    tblEvaluation.add(createCell(colRhsTypes, "#558866", "#aaddbb", ""), 2, 0, 1, 1);
+    tblEvaluation.add(createCell(colRhsTypes, "#558866", "#aaddbb", ""), 1, 0, 1, 1);
+    tblEvaluation.add(createCell(colLhsType, "#558866", "#aaddbb", ""), 2, 0, 1, 1);
     tblEvaluation.add(createCell(colConversionRule, "#558866", "#aaddbb", ""), 3, 0, 1, 1);
-    tblEvaluation.add(createCell(colValue, "#558866", "#aaddbb", ""), 4, 0, 1, 1);
-    tblEvaluation.add(createCell(colValues, "#558866", "#aaddbb", ""), 5, 0, 1, 1);
+    tblEvaluation.add(createCell(colValues, "#558866", "#aaddbb", ""), 4, 0, 1, 1);
+    tblEvaluation.add(createCell(colValue, "#558866", "#aaddbb", ""), 5, 0, 1, 1);
     
     int row = 1;
     for (ExpressionEvaluation.EvaluationRow record : ev.evaluation) {
@@ -213,11 +254,11 @@ public class UIExpressionEvaluation extends Application {
       Label rowValues = new Label(record.value);
       rowValues.setStyle("-fx-font-size: 16;");
       tblEvaluation.add(createCell(rowOperation, "#558866", "#ccffdd", ""), 0, row, 1, 1);
-      tblEvaluation.add(createCell(rowLhsType, "#558866", "#ccffdd", ""), 1, row, 1, 1);
-      tblEvaluation.add(createCell(rowRhsTypes, "#558866", "#ccffdd", ""), 2, row, 1, 1);
+      tblEvaluation.add(createCell(rowRhsTypes, "#558866", "#ccffdd", ""), 1, row, 1, 1);
+      tblEvaluation.add(createCell(rowLhsType, "#558866", "#ccffdd", ""), 2, row, 1, 1);
       tblEvaluation.add(createCell(rowConversionRule, "#558866", "#ccffdd", ""), 3, row, 1, 1);
-      tblEvaluation.add(createCell(rowValues, "#558866", "#ccffdd", ""), 4, row, 1, 1);
-      tblEvaluation.add(createCell(rowValue, "#558866", "#ccffdd", ""), 5, row, 1, 1);
+      tblEvaluation.add(createCell(rowValue, "#558866", "#ccffdd", ""), 4, row, 1, 1);
+      tblEvaluation.add(createCell(rowValues, "#558866", "#ccffdd", ""), 5, row, 1, 1);
       ++row;
     }
   }
@@ -231,6 +272,113 @@ public class UIExpressionEvaluation extends Application {
                   otherCss + ";");
     cell.setPadding(new Insets(5, 5, 5, 5));
     return cell;
+  }
+  
+  
+  
+  
+  
+  int VARIABLE_LIMIT = 6;
+  int createdVariables = 0;
+  String[] variableNames = {"A", "B", "C", "D", "E", "F"};
+  
+  List<Variable> customVariables = new ArrayList<>();
+  
+  class Variable {
+    public String name;
+    public String value;
+    public String type;
+  }
+  
+  
+  
+  HBox createBuildVariableRow() {
+    ++createdVariables;
+    if (createdVariables > VARIABLE_LIMIT) return null;
+    HBox row = new HBox();
+    
+    final int idx = createdVariables-1;
+    Label variableName = new Label(variableNames[createdVariables-1]);
+    
+    ObservableList<String> options = FXCollections.observableArrayList(
+      "char", "unsigned short", "short", "unsigned int", "int", "unsigned long", "long"
+    );
+    ComboBox cboTypes = new ComboBox(options);
+    cboTypes.getSelectionModel().select(4);
+    cboTypes.setOnAction(e -> {
+      Variable var = customVariables.get(idx);
+      var.type = (String)(cboTypes.getValue());
+    });
+    
+    TextField txtValue = new TextField("Enter Value");
+    txtValue.textProperty().addListener(new ChangeListener<String>() {
+      public void changed(ObservableValue<? extends String> observable,
+                          String oldValue, String newValue)
+      {
+        String val = convertNumber(newValue);
+        txtValue.setText(val);
+        Variable var = customVariables.get(idx);
+        var.value = val;
+      }
+    });
+    
+    row.getChildren().addAll(variableName, cboTypes, txtValue);
+    
+    Variable var = new Variable();
+    var.name = variableNames[createdVariables-1];
+    var.value = "Enter Value";
+    var.type = "int";
+    customVariables.add(var);
+    
+    return row;
+  }
+  
+  
+  int getIndexOfCreatedVariable(String name) {
+    for (int n = 0; n < customVariables.size(); ++n) {
+      if (customVariables.get(n).name.equals(name)) return n;
+    }
+    return -1;
+  }
+  
+  
+  void runCustomAnalysis() {
+    try {
+      String contents = "";
+      for (Variable var : customVariables) {
+        contents += (var.type + " " + var.name + " = " + var.value + ";" + System.lineSeparator());
+      }
+      contents += (txtEquation.getText() + ";" + System.lineSeparator());
+      
+      FileWriter fileWriter = new FileWriter("customequation.c");
+      fileWriter.write(contents);
+      fileWriter.close();
+      
+      Process proc = Runtime.getRuntime().exec("java -jar ceval.jar customequation.c");
+      proc.waitFor();
+      
+      parseEvaluation("customequation.c.vaccs.ascii");
+    }
+    catch (Exception e) {
+      System.err.println("Exception while attempting to evaluate custom equation: " + e);
+    }
+  }
+  
+  
+  String convertNumber(String number) {
+    String check = number.toUpperCase();
+    if (check.equals("CHAR_MIN")) return "-128";
+    else if (check.equals("CHAR_MAX")) return "127";
+    else if (check.equals("SHRT_MIN")) return "-32768";
+    else if (check.equals("SHRT_MAX")) return "32767";
+    else if (check.equals("USHRT_MAX")) return "65535";
+    else if (check.equals("INT_MIN")) return "-2147483648";
+    else if (check.equals("INT_MAX")) return "2147483647";
+    else if (check.equals("UINT_MAX")) return "4294967295";
+    else if (check.equals("LONG_MIN")) return "-9223372036854775808";
+    else if (check.equals("LONG_MAX")) return "9223372036854775807";
+    else if (check.equals("ULONG_MAX")) return "18446744073709551615";
+    return number;
   }
   
 }
