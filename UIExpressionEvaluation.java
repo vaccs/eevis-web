@@ -29,6 +29,16 @@ public class UIExpressionEvaluation extends Application {
   TextField txtEquation;
  
   public static void main(String[] args) {
+  
+    // redirect stderr
+    try {
+      FileOutputStream f = new FileOutputStream("errorlog.txt"); 
+      System.setErr(new PrintStream(f));
+    }
+    catch (Exception e) {
+      System.err.println(e);
+    }
+  
     launch(args);
   }
   
