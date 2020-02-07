@@ -18,7 +18,7 @@ import javafx.stage.*;
  
 public class UIExpressionEvaluation extends Application {
 
-  FileChooser fileChooser;
+  FileChooser fileChooser, fileChooserSave;
 
   ExpressionEvaluation ev;
   Label lblEquation;
@@ -40,6 +40,12 @@ public class UIExpressionEvaluation extends Application {
       new FileChooser.ExtensionFilter("Equation files (*.vaccs.ascii)", "*.vaccs.ascii");
     fileChooser.getExtensionFilters().add(extFilter);
     fileChooser.setTitle("Load Equation");
+    
+    fileChooserSave = new FileChooser();
+    FileChooser.ExtensionFilter extFilterSave =
+      new FileChooser.ExtensionFilter("C source files (*.c)", "*.c");
+    fileChooserSave.getExtensionFilters().add(extFilterSave);
+    fileChooserSave.setTitle("Save Equation");
   
     primaryStage.setTitle("Expression Evaluation Vis");
     Group root = new Group();
@@ -62,7 +68,7 @@ public class UIExpressionEvaluation extends Application {
         try {
           parseEvaluation(absolutePath);
         }
-        catch (IOException ex) {
+        catch (Exception ex) {
           System.err.println(ex);
         }
       }
@@ -107,18 +113,29 @@ public class UIExpressionEvaluation extends Application {
     Button btnEvaluate = new Button("Evaluate");
     btnEvaluate.setStyle("-fx-font-size: 16;");
     btnEvaluate.setOnAction(e -> {
-      runCustomAnalysis();
+      runCustomAnalysis("customequation.c", true);
+    });
+    
+    Button btnSave = new Button("Save");
+    btnSave.setStyle("-fx-font-size: 16;");
+    btnSave.setOnAction(e -> {
+      File file = fileChooserSave.showSaveDialog(primaryStage);
+      if (file != null) {
+        String absolutePath = file.getAbsolutePath();
+        runCustomAnalysis(absolutePath, false);
+      }
     });
     
     txtEquation = new TextField("Enter Equation (e.g. A = B + C)");
     
     buildEquationContainer.setPadding(new Insets(10, 10, 10, 10));
-    buildEquationContainer.add(lblBuild1,        0, 0, 3, 1);
+    buildEquationContainer.add(lblBuild1,        0, 0, 4, 1);
     buildEquationContainer.add(btnAddVariable,   0, 1, 1, 1);
     buildEquationContainer.add(btnClear,         1, 1, 1, 1);
     buildEquationContainer.add(btnEvaluate,      2, 1, 1, 1);
-    buildEquationContainer.add(txtEquation,      0, 2, 3, 1);
-    buildEquationContainer.add(boxBuildEquation, 0, 3, 3, 5);
+    buildEquationContainer.add(btnSave,          3, 1, 1, 1);
+    buildEquationContainer.add(txtEquation,      0, 2, 4, 1);
+    buildEquationContainer.add(boxBuildEquation, 0, 3, 4, 5);
     
     
     parseEvaluation("examples/test1.c.vaccs.ascii");
@@ -342,7 +359,7 @@ public class UIExpressionEvaluation extends Application {
   }
   
   
-  void runCustomAnalysis() {
+  void runCustomAnalysis(String filename, boolean toRead) {
     try {
       String contents = "";
       for (Variable var : customVariables) {
@@ -350,14 +367,14 @@ public class UIExpressionEvaluation extends Application {
       }
       contents += (txtEquation.getText() + ";" + System.lineSeparator());
       
-      FileWriter fileWriter = new FileWriter("customequation.c");
+      FileWriter fileWriter = new FileWriter(filename);
       fileWriter.write(contents);
       fileWriter.close();
       
-      Process proc = Runtime.getRuntime().exec("java -jar ceval.jar customequation.c");
+      Process proc = Runtime.getRuntime().exec("java -jar ceval.jar " + filename);
       proc.waitFor();
       
-      parseEvaluation("customequation.c.vaccs.ascii");
+      if (toRead) parseEvaluation(filename + ".vaccs.ascii");
     }
     catch (Exception e) {
       System.err.println("Exception while attempting to evaluate custom equation: " + e);
