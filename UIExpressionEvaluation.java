@@ -73,6 +73,8 @@ public class UIExpressionEvaluation extends Application {
         }
       }
     });
+    Tooltip tipLoad = new Tooltip("Select an equation analysis file to load");
+    Tooltip.install(btnLoad, tipLoad);
     
     lblEquation = new Label("-----");
     lblEquation.setStyle("-fx-font-size: 16;");
@@ -119,6 +121,8 @@ public class UIExpressionEvaluation extends Application {
       helpWindow.setScene(helpScene);
       helpWindow.show();
     });
+    Tooltip tipHelp = new Tooltip("Open an explanation for how to create a custom equation");
+    Tooltip.install(btnHelp, tipHelp);
     
     Button btnAddVariable = new Button("Add Variable");
     btnAddVariable.setStyle("-fx-font-size: 16;");
@@ -126,6 +130,8 @@ public class UIExpressionEvaluation extends Application {
       HBox row = createBuildVariableRow();
       if (row != null) boxBuildEquation.getChildren().add(row);
     });
+    Tooltip tipAddVariable = new Tooltip("Define a new variable to include in your custom equation");
+    Tooltip.install(btnAddVariable, tipAddVariable);
     
     Button btnClear = new Button("Clear");
     btnClear.setStyle("-fx-font-size: 16;");
@@ -134,12 +140,16 @@ public class UIExpressionEvaluation extends Application {
       createdVariables = 0;
       customVariables.clear();
     });
+    Tooltip tipClear = new Tooltip("Remove all of the variables you have defined");
+    Tooltip.install(btnClear, tipClear);
     
     Button btnEvaluate = new Button("Evaluate");
     btnEvaluate.setStyle("-fx-font-size: 16;");
     btnEvaluate.setOnAction(e -> {
       runCustomAnalysis("customequation.c", true);
     });
+    Tooltip tipEvaluate = new Tooltip("Perform and display analysis of the custom equation you have set up");
+    Tooltip.install(btnEvaluate, tipEvaluate);
     
     Button btnSave = new Button("Save");
     btnSave.setStyle("-fx-font-size: 16;");
@@ -150,6 +160,8 @@ public class UIExpressionEvaluation extends Application {
         runCustomAnalysis(absolutePath, false);
       }
     });
+    Tooltip tipSave = new Tooltip("Save your custom equation and analysis results to a file");
+    Tooltip.install(btnSave, tipSave);
     
     txtEquation = new TextField("Enter Equation (e.g. A = B + C)");
     
