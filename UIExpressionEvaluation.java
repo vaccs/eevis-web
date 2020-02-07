@@ -116,8 +116,9 @@ public class UIExpressionEvaluation extends Application {
       btnOk.setOnAction(ev -> {
         helpWindow.close();
       });
-      Scene helpScene = new Scene(VBoxBuilder.create()
-        .children(new Text("To create your own equation, first define the variables that will be used in" + System.lineSeparator() +
+      VBox vbox = new VBox();
+      vbox.getChildren().addAll(
+          new Text("To create your own equation, first define the variables that will be used in" + System.lineSeparator() +
           "the equation. To define a variable, click the Add Variable button. The variable will" + System.lineSeparator() +
           "automatically be assigned a one-letter name, shown on the left. You can then use the" + System.lineSeparator() +
           "drop-down box to set the variable's type and the text field to enter its initial value." + System.lineSeparator() +
@@ -126,8 +127,10 @@ public class UIExpressionEvaluation extends Application {
           "provided field at the top. The equation must be a single line of valid C that consists of" + System.lineSeparator() +
           "the variables you defined and valid arithmetic operations, such as A = B * C / D + E." + System.lineSeparator() +
           "When you are ready to evaluate your equation, click the Evaluate button. You can save" + System.lineSeparator() +
-          "the results of your evaluation to a file with the Save button." + System.lineSeparator()), btnOk)
-        .alignment(Pos.CENTER).padding(new Insets(10)).build());
+          "the results of your evaluation to a file with the Save button." + System.lineSeparator()), btnOk);
+      vbox.setAlignment(Pos.CENTER);
+      vbox.setPadding(new Insets(10));
+      Scene helpScene = new Scene(vbox);
       helpWindow.setScene(helpScene);
       helpWindow.show();
     });
