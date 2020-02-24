@@ -78,7 +78,9 @@ public class UIExpressionEvaluation extends Application {
         try {
           parseEvaluation(absolutePath);
           createdVariables = 0;
-          populateEquationEditor();
+          boxBuildEquation.getChildren().clear();
+          List<HBox> newVariableRows = populateEquationEditor();
+          for (HBox h : newVariableRows) boxBuildEquation.getChildren().add(h);
         }
         catch (Exception ex) {
           System.err.println(ex);
@@ -142,7 +144,7 @@ public class UIExpressionEvaluation extends Application {
     Button btnAddVariable = new Button("Add Variable");
     btnAddVariable.setStyle("-fx-font-size: 16;");
     btnAddVariable.setOnAction(e -> {
-      HBox row = createBuildVariableRow();
+      HBox row = createBuildVariableRow(null, null, null);
       if (row != null) boxBuildEquation.getChildren().add(row);
     });
     Tooltip tipAddVariable = new Tooltip("Define a new variable to include in your custom equation");
@@ -191,6 +193,10 @@ public class UIExpressionEvaluation extends Application {
     
     
     parseEvaluation("examples/test1.c.vaccs.ascii");
+    createdVariables = 0;
+    boxBuildEquation.getChildren().clear();
+    List<HBox> newVariableRows = populateEquationEditor();
+    for (HBox h : newVariableRows) boxBuildEquation.getChildren().add(h);
     
     // display /////////////////////////////////////////////////////////////////////////////////////
     GridPane layout = new GridPane();
@@ -244,6 +250,7 @@ public class UIExpressionEvaluation extends Application {
     ev.parseEvaluation(fileContents);
     
     lblEquation.setText(ev.equation);
+    txtEquation.setText(ev.equation);
     buildVariablesTable();
     buildEvaluationTable();
   }
@@ -357,13 +364,14 @@ public class UIExpressionEvaluation extends Application {
   
   
   
-  HBox createBuildVariableRow() {
+  HBox createBuildVariableRow(String name, String type, String value) {
+    if (type != null && type.startsWith("signed ")) type = type.substring(7, type.length());
     HBox row = new HBox();
     
     ++createdVariables;
     final int idx = createdVariables-1;
     
-    TextField txtName = new TextField("var_name");
+    TextField txtName = new TextField((name == null ? "var_name" : name));
     txtName.textProperty().addListener(new ChangeListener<String>() {
       public void changed(ObservableValue<? extends String> observable,
                           String oldValue, String newValue)
@@ -378,12 +386,20 @@ public class UIExpressionEvaluation extends Application {
     );
     ComboBox cboTypes = new ComboBox(options);
     cboTypes.getSelectionModel().select(4);
+    if (type != null) {
+      for (int n = 0; n < options.size(); ++n) {
+        if (options.get(n).equals(type)) {
+          cboTypes.getSelectionModel().select(n);
+          break;
+        }
+      }
+    }
     cboTypes.setOnAction(e -> {
       Variable var = customVariables.get(idx);
       var.type = (String)(cboTypes.getValue());
     });
     
-    TextField txtValue = new TextField("Enter Value");
+    TextField txtValue = new TextField((value == null ? "Enter Value" : value));
     txtValue.textProperty().addListener(new ChangeListener<String>() {
       public void changed(ObservableValue<? extends String> observable,
                           String oldValue, String newValue)
@@ -438,52 +454,19 @@ public class UIExpressionEvaluation extends Application {
   }
   
   
-  void populateEquationEditor() {
-  /*
+  List<HBox> populateEquationEditor() {
     createdVariables = 0;
+    List<HBox> newVariableRows = new ArrayList<>();
   
     for (ExpressionEvaluation.VariableRecord record : ev.variableTable) {
     
       ++createdVariables;
       HBox row = new HBox();
       
-      // record.name, type, value
-    
-      Label variableName = new Label(record.name); // pick up from here
-    
-      ObservableList<String> options = FXCollections.observableArrayList(
-        "char", "unsigned short", "short", "unsigned int", "int", "unsigned long", "long"
-      );
-      ComboBox cboTypes = new ComboBox(options);
-      cboTypes.getSelectionModel().select(4);
-      cboTypes.setOnAction(e -> {
-        Variable var = customVariables.get(idx);
-        var.type = (String)(cboTypes.getValue());
-      });
-      
-      TextField txtValue = new TextField("Enter Value");
-      txtValue.textProperty().addListener(new ChangeListener<String>() {
-        public void changed(ObservableValue<? extends String> observable,
-                            String oldValue, String newValue)
-        {
-          String val = convertNumber(newValue);
-          txtValue.setText(val);
-          Variable var = customVariables.get(idx);
-          var.value = val;
-        }
-      });
-      
-      row.getChildren().addAll(variableName, cboTypes, txtValue);
-      
-      Variable var = new Variable();
-      var.name = variableNames[createdVariables-1];
-      var.value = "Enter Value";
-      var.type = "int";
-      customVariables.add(var);
-
+      newVariableRows.add(createBuildVariableRow(record.name, record.type, record.value));
     }
-    // TODO
-      /* */
+    
+    return newVariableRows;
   }
 
   
