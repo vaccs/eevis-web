@@ -77,6 +77,8 @@ public class UIExpressionEvaluation extends Application {
         String absolutePath = file.getAbsolutePath();
         try {
           parseEvaluation(absolutePath);
+          createdVariables = 0;
+          populateEquationEditor();
         }
         catch (Exception ex) {
           System.err.println(ex);
@@ -150,7 +152,6 @@ public class UIExpressionEvaluation extends Application {
     btnClear.setStyle("-fx-font-size: 16;");
     btnClear.setOnAction(e -> {
       boxBuildEquation.getChildren().clear();
-      createdVariables = 0;
       customVariables.clear();
     });
     Tooltip tipClear = new Tooltip("Remove all of the variables you have defined");
@@ -345,11 +346,7 @@ public class UIExpressionEvaluation extends Application {
   
   
   
-  
-  int VARIABLE_LIMIT = 6;
   int createdVariables = 0;
-  String[] variableNames = {"A", "B", "C", "D", "E", "F"};
-  
   List<Variable> customVariables = new ArrayList<>();
   
   class Variable {
@@ -361,12 +358,20 @@ public class UIExpressionEvaluation extends Application {
   
   
   HBox createBuildVariableRow() {
-    ++createdVariables;
-    if (createdVariables > VARIABLE_LIMIT) return null;
     HBox row = new HBox();
     
+    ++createdVariables;
     final int idx = createdVariables-1;
-    Label variableName = new Label(variableNames[createdVariables-1]);
+    
+    TextField txtName = new TextField("var_name");
+    txtName.textProperty().addListener(new ChangeListener<String>() {
+      public void changed(ObservableValue<? extends String> observable,
+                          String oldValue, String newValue)
+      {
+        Variable var = customVariables.get(idx);
+        var.name = newValue;
+      }
+    });
     
     ObservableList<String> options = FXCollections.observableArrayList(
       "char", "unsigned short", "short", "unsigned int", "int", "unsigned long", "long"
@@ -390,10 +395,10 @@ public class UIExpressionEvaluation extends Application {
       }
     });
     
-    row.getChildren().addAll(variableName, cboTypes, txtValue);
+    row.getChildren().addAll(txtName, cboTypes, txtValue);
     
     Variable var = new Variable();
-    var.name = variableNames[createdVariables-1];
+    var.name = "var_name";
     var.value = "Enter Value";
     var.type = "int";
     customVariables.add(var);
@@ -432,6 +437,55 @@ public class UIExpressionEvaluation extends Application {
     }
   }
   
+  
+  void populateEquationEditor() {
+  /*
+    createdVariables = 0;
+  
+    for (ExpressionEvaluation.VariableRecord record : ev.variableTable) {
+    
+      ++createdVariables;
+      HBox row = new HBox();
+      
+      // record.name, type, value
+    
+      Label variableName = new Label(record.name); // pick up from here
+    
+      ObservableList<String> options = FXCollections.observableArrayList(
+        "char", "unsigned short", "short", "unsigned int", "int", "unsigned long", "long"
+      );
+      ComboBox cboTypes = new ComboBox(options);
+      cboTypes.getSelectionModel().select(4);
+      cboTypes.setOnAction(e -> {
+        Variable var = customVariables.get(idx);
+        var.type = (String)(cboTypes.getValue());
+      });
+      
+      TextField txtValue = new TextField("Enter Value");
+      txtValue.textProperty().addListener(new ChangeListener<String>() {
+        public void changed(ObservableValue<? extends String> observable,
+                            String oldValue, String newValue)
+        {
+          String val = convertNumber(newValue);
+          txtValue.setText(val);
+          Variable var = customVariables.get(idx);
+          var.value = val;
+        }
+      });
+      
+      row.getChildren().addAll(variableName, cboTypes, txtValue);
+      
+      Variable var = new Variable();
+      var.name = variableNames[createdVariables-1];
+      var.value = "Enter Value";
+      var.type = "int";
+      customVariables.add(var);
+
+    }
+    // TODO
+      /* */
+  }
+
   
   String convertNumber(String number) {
     String check = number.toUpperCase();
