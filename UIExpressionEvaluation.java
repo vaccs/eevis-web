@@ -121,8 +121,8 @@ public class UIExpressionEvaluation extends Application {
       VBox vbox = new VBox();
       vbox.getChildren().addAll(
           new Text("To create your own equation, first define the variables that will be used in" + System.lineSeparator() +
-          "the equation. To define a variable, click the Add Variable button. The variable will" + System.lineSeparator() +
-          "automatically be assigned a one-letter name, shown on the left. You can then use the" + System.lineSeparator() +
+          "the equation. To define a variable, click the Add Variable button. The text box on the" + System.lineSeparator() +
+          "left is where you can give the variable any unique, valid C variable name. You can use the" + System.lineSeparator() +
           "drop-down box to set the variable's type and the text field to enter its initial value." + System.lineSeparator() +
           "All variables require an initial value, even the one being assigned to. You can click the" + System.lineSeparator() +
           "Clear button to remove all variables you have defined. Then, enter your equation in the" + System.lineSeparator() +
