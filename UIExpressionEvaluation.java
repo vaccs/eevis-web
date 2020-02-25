@@ -192,11 +192,11 @@ public class UIExpressionEvaluation extends Application {
     buildEquationContainer.add(boxBuildEquation, 0, 3, 4, 5);
     
     
-    parseEvaluation("examples/test1.c.vaccs.ascii");
+//    parseEvaluation("examples/test1.c.vaccs.ascii");
     createdVariables = 0;
-    boxBuildEquation.getChildren().clear();
-    List<HBox> newVariableRows = populateEquationEditor();
-    for (HBox h : newVariableRows) boxBuildEquation.getChildren().add(h);
+//    boxBuildEquation.getChildren().clear();
+//    List<HBox> newVariableRows = populateEquationEditor();
+//    for (HBox h : newVariableRows) boxBuildEquation.getChildren().add(h);
     
     // display /////////////////////////////////////////////////////////////////////////////////////
     GridPane layout = new GridPane();
