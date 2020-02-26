@@ -77,7 +77,6 @@ public class UIExpressionEvaluation extends Application {
         String absolutePath = file.getAbsolutePath();
         try {
           parseEvaluation(absolutePath);
-          createdVariables = 0;
           boxBuildEquation.getChildren().clear();
           List<HBox> newVariableRows = populateEquationEditor();
           for (HBox h : newVariableRows) boxBuildEquation.getChildren().add(h);
@@ -144,7 +143,7 @@ public class UIExpressionEvaluation extends Application {
     Button btnAddVariable = new Button("Add Variable");
     btnAddVariable.setStyle("-fx-font-size: 16;");
     btnAddVariable.setOnAction(e -> {
-      HBox row = createBuildVariableRow(null, null, null);
+      HBox row = createBuildVariableRow(null, null, null, true);
       if (row != null) boxBuildEquation.getChildren().add(row);
     });
     Tooltip tipAddVariable = new Tooltip("Define a new variable to include in your custom equation");
@@ -154,6 +153,7 @@ public class UIExpressionEvaluation extends Application {
     btnClear.setStyle("-fx-font-size: 16;");
     btnClear.setOnAction(e -> {
       boxBuildEquation.getChildren().clear();
+      createdVariables = 0;
       customVariables.clear();
     });
     Tooltip tipClear = new Tooltip("Remove all of the variables you have defined");
@@ -253,6 +253,12 @@ public class UIExpressionEvaluation extends Application {
     txtEquation.setText(ev.equation);
     buildVariablesTable();
     buildEvaluationTable();
+    
+    customVariables.clear();
+    
+    for (ExpressionEvaluation.VariableRecord record : ev.variableTable) {
+      customVariables.add(new Variable(record.name, record.value, record.type));
+    }
   }
   
   
@@ -360,16 +366,24 @@ public class UIExpressionEvaluation extends Application {
     public String name;
     public String value;
     public String type;
+    
+    public Variable() {}
+    
+    public Variable(String name, String value, String type) {
+      this.name = name;
+      this.value = value;
+      this.type = type;
+    }
   }
   
   
   
-  HBox createBuildVariableRow(String name, String type, String value) {
+  HBox createBuildVariableRow(String name, String type, String value, boolean isNew) {
     if (type != null && type.startsWith("signed ")) type = type.substring(7, type.length());
     HBox row = new HBox();
     
+    final int idx = createdVariables;
     ++createdVariables;
-    final int idx = createdVariables-1;
     
     TextField txtName = new TextField((name == null ? "var_name" : name));
     txtName.textProperty().addListener(new ChangeListener<String>() {
@@ -413,11 +427,13 @@ public class UIExpressionEvaluation extends Application {
     
     row.getChildren().addAll(txtName, cboTypes, txtValue);
     
-    Variable var = new Variable();
-    var.name = "var_name";
-    var.value = "Enter Value";
-    var.type = "int";
-    customVariables.add(var);
+    if (isNew) {
+      Variable var = new Variable();
+      var.name = "var_name";
+      var.value = "Enter Value";
+      var.type = "int";
+      customVariables.add(var);
+    }
     
     return row;
   }
@@ -435,7 +451,9 @@ public class UIExpressionEvaluation extends Application {
     try {
       String contents = "";
       for (Variable var : customVariables) {
-        contents += (var.type + " " + var.name + " = " + var.value + ";" + System.lineSeparator());
+        contents += (var.type + " " + var.name + " = " + 
+          (var.value.equals("<NOVALUE>") ? "0" : var.value)
+          + ";" + System.lineSeparator());
       }
       contents += (txtEquation.getText() + ";" + System.lineSeparator());
       
@@ -459,11 +477,10 @@ public class UIExpressionEvaluation extends Application {
     List<HBox> newVariableRows = new ArrayList<>();
   
     for (ExpressionEvaluation.VariableRecord record : ev.variableTable) {
-    
-      ++createdVariables;
       HBox row = new HBox();
       
-      newVariableRows.add(createBuildVariableRow(record.name, record.type, record.value));
+      newVariableRows.add(
+        createBuildVariableRow(record.name, record.type, record.value, false));
     }
     
     return newVariableRows;
