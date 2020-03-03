@@ -1,0 +1,24 @@
+architecture~!~x86_64
+equation~!~uc = uc + c
+var_decl_node~!~c|signed char|-15
+var_decl_node~!~uc|unsigned char|241
+ast_node~!~15|0|2|[16, 17]|3| = |1|[7]
+ast_node~!~17|15|2|[18, 19]|3| + |2|[5, 6]
+ast_node~!~18|17|0|[]|3|uc|1|[2]
+ast_node~!~19|17|0|[]|3|c|2|[3, 4]
+ast_node~!~16|15|0|[]|3|uc|0|[]
+traversal~!~[18,19,17,16,15]
+assembly~!~2|18|%t0 = uc|0|unsigned int|[unsigned char]
+assembly~!~3|19|%t1 = c|0|int|[char]
+assembly~!~4|19|%t2 = %t1|2|unsigned int|[int]
+assembly~!~5|17|%t3 = %t0 + %t2|-1|unsigned int|[unsigned int, unsigned int]
+assembly~!~6|17|%t4 = %t3|-1|unsigned char|[unsigned int]
+assembly~!~7|15|uc = %t4|-1|unsigned char|[unsigned char]
+function_invocation~!~1|0|char.c`main|1
+return_address~!~main|0|0
+variable_access~!~2|18|2|unsigned int|%t0|241
+variable_access~!~3|19|3|int|%t1|-15
+variable_access~!~4|19|4|unsigned int|%t2|4294967281
+variable_access~!~5|17|5|unsigned int|%t3|226
+variable_access~!~6|17|6|unsigned char|%t4|226
+variable_access~!~7|15|7|unsigned char|uc|226

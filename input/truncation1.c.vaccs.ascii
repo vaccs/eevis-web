@@ -1,0 +1,14 @@
+architecture~!~x86_64
+equation~!~i = u
+var_decl_node~!~u|unsigned short|32768
+var_decl_node~!~i|signed short|<NOVALUE>
+ast_node~!~13|0|2|[14, 15]|3| = |1|[2]
+ast_node~!~15|13|0|[]|3|u|1|[1]
+ast_node~!~14|13|0|[]|3|i|0|[]
+traversal~!~[15,14,13]
+assembly~!~1|15|%t0 = u|-1|short|[unsigned short]
+assembly~!~2|13|i = %t0|-1|short|[short]
+function_invocation~!~1|0|truncation1.c`main|1
+return_address~!~main|0|0
+variable_access~!~2|15|1|short|%t0|-32768
+variable_access~!~3|13|2|short|i|-32768

@@ -1,0 +1,2 @@
+#!/bin/bash
+java --module-path ./javafx-sdk-11.0.2-Linux/lib --add-modules javafx.controls -jar ./cevis.jar $*
