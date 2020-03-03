@@ -411,10 +411,10 @@ public class UIExpressionEvaluation extends Application {
       }
     });
 
-    ObservableList<String> options = FXCollections.observableArrayList("char", "unsigned short", "short",
+    ObservableList<String> options = FXCollections.observableArrayList("unsigned char", "char", "unsigned short", "short",
         "unsigned int", "int", "unsigned long", "long");
     ComboBox cboTypes = new ComboBox(options);
-    cboTypes.getSelectionModel().select(4);
+    cboTypes.getSelectionModel().select(5);
     if (type != null) {
       for (int n = 0; n < options.size(); ++n) {
         if (options.get(n).equals(type)) {
