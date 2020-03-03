@@ -1,0 +1,23 @@
+architecture~!~x86_64
+equation~!~z = x + y
+var_decl_node~!~x|signed char|100
+var_decl_node~!~y|signed char|105
+var_decl_node~!~z|signed char|<NOVALUE>
+ast_node~!~16|0|2|[17, 18]|3| = |1|[6]
+ast_node~!~18|16|2|[19, 20]|3| + |2|[4, 5]
+ast_node~!~19|18|0|[]|3|x|1|[2]
+ast_node~!~20|18|0|[]|3|y|1|[3]
+ast_node~!~17|16|0|[]|3|z|0|[]
+traversal~!~[19,20,18,17,16]
+assembly~!~2|19|%t0 = x|0|int|[char]
+assembly~!~3|20|%t1 = y|0|int|[char]
+assembly~!~4|18|%t2 = %t0 + %t1|-1|int|[int, int]
+assembly~!~5|18|%t3 = %t2|-1|char|[int]
+assembly~!~6|16|z = %t3|-1|char|[char]
+function_invocation~!~1|0|test10.c`main|1
+return_address~!~main|0|0
+variable_access~!~2|19|2|int|%t0|100
+variable_access~!~3|20|3|int|%t1|105
+variable_access~!~4|18|4|int|%t2|205
+variable_access~!~5|18|5|char|%t3|-51
+variable_access~!~6|16|6|char|z|-51
