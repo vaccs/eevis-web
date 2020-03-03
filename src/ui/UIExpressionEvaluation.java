@@ -177,7 +177,7 @@ public class UIExpressionEvaluation extends Application {
     Button btnEvaluate = new Button("Evaluate");
     btnEvaluate.setStyle("-fx-font-size: 16;");
     btnEvaluate.setOnAction(e -> {
-      runCustomAnalysis("input/test1.c", true);
+      runCustomAnalysis("customequation.c", true);
     });
     Tooltip tipEvaluate = new Tooltip("Perform and display analysis of the custom equation you have set up");
     Tooltip.install(btnEvaluate, tipEvaluate);
@@ -469,9 +469,6 @@ public class UIExpressionEvaluation extends Application {
       contents += (txtEquation.getText() + ";" + System.lineSeparator());
 
       String analysis = CExpr.processCodeFromString(filename, contents);
-      System.out.println("Analysis");
-      System.out.println("--------");
-      System.out.print(analysis);
       if (toRead)
         parseEvaluationFromString(analysis);
       // FileWriter fileWriter = new FileWriter(filename);

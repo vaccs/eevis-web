@@ -21,6 +21,10 @@
             "name": "Debug (Launch)-UIExpressionEvaluation",
             "request": "launch",
             "mainClass": "ui.UIExpressionEvaluation",
+            "modulePaths": [
+                "./javafx-sdk-11.0.2-Linux/lib"
+            ],
+            ""
         }
     ]
 }

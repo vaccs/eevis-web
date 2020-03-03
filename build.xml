@@ -35,10 +35,11 @@
 	<target name = "build-jar">
    		<jar destfile = "cevis.jar">
                    <fileset dir="${build.dir}" includes="**/*.class"/>
-			<fileset dir="${src.dir}" includes = "assets/*.png"/>
-      			<manifest>
-         			<attribute name = "Main-Class" value = "ui.UIExpressionEvaluation"/>
-      			</manifest>
+                   <zipgroupfileset dir="${lib.dir}" includes="*.jar"/>
+		   <fileset dir="${src.dir}" includes = "assets/*.png"/>
+      		   <manifest>
+         		<attribute name = "Main-Class" value = "ui.UIExpressionEvaluation"/>
+      		   </manifest>
    		</jar>
 	</target>
 	<target name = "clean" description = "Delete class files">
