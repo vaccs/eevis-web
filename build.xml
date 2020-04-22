@@ -4,7 +4,7 @@
 	<property name = "build.dir" value = "classes"/>
         <property name = "lib.dir" value = "lib"/>
 	<property name = "test.dir" value = "src/test"/>
-        <property name = "javafx.dir" value = "javafx-sdk-11.0.2-MacOS/lib"/>
+        <property name = "javafx.dir" value = "javafx-sdk-11.0.2-Windows/lib"/>
 
 	<path id = "master-classpath">
                 <pathelement path = "${build.dir}"/>

@@ -64,7 +64,7 @@ public class UIExpressionEvaluation extends Application {
     primaryStage.setTitle("Expression Evaluation Vis");
     Group root = new Group();
 
-    Image image = new Image("assets/ConversionRules.png");
+    Image image = new Image("file:assets/ConversionRules.png");
     ImageView imv = new ImageView();
     imv.setImage(image);
     imv.setPreserveRatio(true);
