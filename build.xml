@@ -33,7 +33,7 @@
 		</javac>
 	</target>
 	<target name = "build-jar">
-   		<jar destfile = "cevis.jar">
+   		<jar destfile = "vcee.jar">
                    <fileset dir="${build.dir}" includes="**/*.class"/>
                    <zipgroupfileset dir="${lib.dir}" includes="*.jar"/>
 		   <fileset dir="${src.dir}" includes = "assets/*.png"/>
