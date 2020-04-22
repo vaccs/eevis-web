@@ -1,2 +1,2 @@
 #!/bin/bash
-java --module-path ./javafx-sdk-11.0.2-MacOS/lib --add-modules javafx.controls -jar ./cevis.jar $*
+java --module-path $VCEE/javafx-sdk-11.0.2-Linux/lib --add-modules javafx.controls -jar $VCEE/cevis.jar $*

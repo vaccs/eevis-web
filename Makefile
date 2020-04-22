@@ -1,6 +1,6 @@
-default: compile build
+default: parser compile build
 
-full: parser compile build
+part: compile build
 
 compile:
 	ant
