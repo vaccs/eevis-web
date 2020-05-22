@@ -106,10 +106,7 @@ public final class CTypeTables {
 
 	public static int getPromotedType(int type) {
 		if (rank[type] < rank[CINT])
-			if (isSigned(type))
-				return CINT;
-			else
-				return CUINT;
+			return CINT;
 		else
 			return type;
 	}

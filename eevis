@@ -1,2 +1,4 @@
 #!/bin/bash
-java --module-path $EEVIS/javafx-sdk-11.0.2-MacOS/lib --add-modules javafx.controls -jar $EEVIS/cevis.jar $*
+export OS=`uname`
+export EEVIS=`dirname $0`
+java --module-path $EEVIS/javafx-sdk-11.0.2-$OS/lib --add-modules javafx.controls -jar $EEVIS/eevis.jar $*
