@@ -78,7 +78,7 @@ public class CExpr {
 				vior.write(fos);
 				fos.close();
 			}
-			System.exit(0);
+			return null;
 		}
 
 		ASTNode ast = (ASTNode) t.accept(new ASTGenerator());
@@ -100,7 +100,7 @@ public class CExpr {
 				vior.write(fos);
 				fos.close();
 			}
-			System.exit(0);
+			return null;
 		}
 
 		IlocProgram prog;
@@ -124,10 +124,9 @@ public class CExpr {
 				vior.write(fos);
 				fos.close();
 			}
-			System.exit(0);
+			return null;
 		}
 
-		return null;
 	}
 
 	public static String processCodeFromString(String file, String input) throws IOException {
@@ -153,7 +152,7 @@ public class CExpr {
 			VaccsIORecord vior = ((VaccsErrorRecord) vioFactory.makeVaccIORecord("VaccsErrorRecord")).addCompileError()
 					.addErrorMessage("Parse error");
 			vior.write(sw);
-			System.exit(0);
+			return sw.toString();
 		}
 
 		ASTNode ast = (ASTNode) t.accept(new ASTGenerator());
@@ -168,7 +167,7 @@ public class CExpr {
 			VaccsIORecord vior = ((VaccsErrorRecord) vioFactory.makeVaccIORecord("VaccsErrorRecord")).addCompileError()
 					.addErrorMessage(e.getMessage().toString());
 			vior.write(sw);
-			System.exit(0);
+			return sw.toString();
 		}
 
 		IlocProgram prog = cv.getProgram().addStringWriter(sw).addFileName(file).addRoot(ast);
@@ -181,17 +180,15 @@ public class CExpr {
 					.addErrorMessage(e.getMessage().toString());
 
 			vior.write(sw);
-			System.exit(0);
+			return sw.toString();
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 			VaccsIORecord vior = ((VaccsErrorRecord) vioFactory.makeVaccIORecord("VaccsErrorRecord")).addRuntimeError()
 					.addErrorMessage(e.getMessage().toString());
 
 			vior.write(sw);
-			System.exit(0);
+			return sw.toString();
 		}
-
-		return null;
 
 	}
 
