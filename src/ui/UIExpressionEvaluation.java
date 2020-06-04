@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringReader;
@@ -51,18 +52,16 @@ public class UIExpressionEvaluation extends Application {
   public void start(Stage primaryStage) throws IOException {
 
     fileChooser = new FileChooser();
-    FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Equation files (*.vaccs.ascii)",
-        "*.vaccs.ascii");
+    FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Equation files (*.eevis)", "*.eevis");
     fileChooser.getExtensionFilters().add(extFilter);
     fileChooser.setTitle("Load Equation");
 
     fileChooserSave = new FileChooser();
-    FileChooser.ExtensionFilter extFilterSave = new FileChooser.ExtensionFilter("C source files (*.c)", "*.c");
+    FileChooser.ExtensionFilter extFilterSave = new FileChooser.ExtensionFilter("Equation files (*.eevis)", "*.eevis");
     fileChooserSave.getExtensionFilters().add(extFilterSave);
     fileChooserSave.setTitle("Save Equation");
 
     primaryStage.setTitle("Expression Evaluation Vis");
-    Group root = new Group();
 
     Image image = new Image("file:assets/ConversionRules.png");
     ImageView imv = new ImageView();
@@ -80,7 +79,8 @@ public class UIExpressionEvaluation extends Application {
       if (file != null) {
         String absolutePath = file.getAbsolutePath();
         try {
-          parseEvaluationFromFile(absolutePath);
+
+          parseEvaluationFromString(CExpr.processCodeFromString("customequation.eevis", loadFile(absolutePath)));
           boxBuildEquation.getChildren().clear();
           List<HBox> newVariableRows = populateEquationEditor();
           for (HBox h : newVariableRows)
@@ -177,7 +177,7 @@ public class UIExpressionEvaluation extends Application {
     Button btnEvaluate = new Button("Evaluate");
     btnEvaluate.setStyle("-fx-font-size: 16;");
     btnEvaluate.setOnAction(e -> {
-      runCustomAnalysis("customequation.c", true);
+      runCustomAnalysis("customequation.eevis", true);
     });
     Tooltip tipEvaluate = new Tooltip("Perform and display analysis of the custom equation you have set up");
     Tooltip.install(btnEvaluate, tipEvaluate);
@@ -188,7 +188,7 @@ public class UIExpressionEvaluation extends Application {
       File file = fileChooserSave.showSaveDialog(primaryStage);
       if (file != null) {
         String absolutePath = file.getAbsolutePath();
-        runCustomAnalysis(absolutePath, false);
+        saveFile(absolutePath);
       }
     });
     Tooltip tipSave = new Tooltip("Save your custom equation and analysis results to a file");
@@ -246,9 +246,49 @@ public class UIExpressionEvaluation extends Application {
     // primaryStage.setMinWidth(1000);
     // primaryStage.setMinHeight(500);
 
-    root.getChildren().add(layout);
+    ScrollPane scrollPane = new ScrollPane(layout);
+    scrollPane.setFitToHeight(true);
+
+    BorderPane root = new BorderPane(scrollPane);
+    root.setPadding(new Insets(10));
+    root.setTop(layout);
+
     primaryStage.setScene(new Scene(root));
     primaryStage.show();
+  }
+
+  private String loadFile(String absolutePath) {
+    String input = "";
+    try {
+      BufferedReader fr = new BufferedReader(new FileReader(absolutePath));
+      String line;
+      while ((line = fr.readLine()) != null) {
+        input += line;
+      }
+      fr.close();
+    } catch (IOException e) {
+      System.err.println("Exception while attempting to load custom equation: " + e);
+    }
+
+    return input;
+  }
+
+  private void saveFile(String absolutePath) {
+    try {
+      String contents = "";
+      for (Variable var : customVariables) {
+        contents += (var.type + " " + var.name + " = " + (var.value.equals("<NOVALUE>") ? "0" : var.value) + ";"
+            + System.lineSeparator());
+      }
+      contents += (txtEquation.getText() + ";" + System.lineSeparator());
+
+      FileWriter fileWriter = new FileWriter(absolutePath);
+      fileWriter.write(contents);
+      fileWriter.close();
+
+    } catch (Exception e) {
+      System.err.println("Exception while attempting to save custom equation: " + e);
+    }
   }
 
   void parseEvaluation(BufferedReader reader) throws IOException {
@@ -411,8 +451,8 @@ public class UIExpressionEvaluation extends Application {
       }
     });
 
-    ObservableList<String> options = FXCollections.observableArrayList("unsigned char", "char", "unsigned short", "short",
-        "unsigned int", "int", "unsigned long", "long");
+    ObservableList<String> options = FXCollections.observableArrayList("unsigned char", "char", "unsigned short",
+        "short", "unsigned int", "int", "unsigned long", "long");
     ComboBox cboTypes = new ComboBox(options);
     cboTypes.getSelectionModel().select(5);
     if (type != null) {
