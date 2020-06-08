@@ -10,6 +10,7 @@ import java.io.PrintStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import driver.CExpr;
 import javafx.application.Application;
@@ -18,6 +19,7 @@ import javafx.collections.*;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
@@ -478,7 +480,33 @@ public class UIExpressionEvaluation extends Application {
       }
     });
 
-    row.getChildren().addAll(txtName, cboTypes, txtValue);
+    // add a button to delete the variable
+    Button btnXVariable = new Button("X");
+    btnXVariable.setStyle("-fx-font-size: 14;");
+    btnXVariable.setOnAction(e -> {
+      // add a popup dialog to confirm yes/no
+      ButtonType yesButton = new ButtonType("Yes", ButtonData.YES);
+      ButtonType noButton = new ButtonType("No", ButtonData.YES);
+      Dialog<ButtonType> dialog = new Dialog<>();
+      dialog.setTitle("Variable Delete Dialog");
+      dialog.setContentText("Are you sure you want to delete the variable " + customVariables.get(idx).name + "?");
+      dialog.getDialogPane().getButtonTypes().add(yesButton);
+      dialog.getDialogPane().getButtonTypes().add(noButton);
+      boolean disabled = false; // computed based on content of text fields, for example
+      dialog.getDialogPane().lookupButton(yesButton).setDisable(disabled);
+      dialog.getDialogPane().lookupButton(noButton).setDisable(disabled);
+      dialog.showAndWait().filter(response -> response.getText() == "Yes").ifPresent(response -> {
+        customVariables.remove(idx);
+        createdVariables--;
+        row.getChildren().clear();
+        boxBuildEquation.getChildren().remove(row);
+      });
+    });
+
+    Tooltip tipXVariable = new Tooltip("Delete this variable");
+    Tooltip.install(btnXVariable, tipXVariable);
+
+    row.getChildren().addAll(txtName, cboTypes, txtValue, btnXVariable);
 
     if (isNew) {
       Variable var = new Variable();
