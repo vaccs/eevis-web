@@ -9,7 +9,6 @@ import ast.CByte;
 import ast.CInt;
 import ast.CLong;
 import ast.CShort;
-import ast.CTypeName;
 import ast.Constant;
 import ast.Divide;
 import ast.IdDecl;
@@ -20,7 +19,6 @@ import ast.Multiply;
 import ast.Program;
 import ast.Put;
 import ast.Signed;
-import ast.Statement;
 import ast.Subtract;
 import ast.TypeCast;
 import ast.TypeSpecification;
@@ -224,7 +222,7 @@ public class CSourceVisitor implements ASTVisitor<String> {
 	 */
 	@Override
 	public String visit(TypeCast n) throws CException {
-		return "(" + n.getCastType().accept(this) + ")";
+		return "(" + n.getCastType().accept(this) + ")" + n.getExpression().accept(this);
 	}
 
 	/*
@@ -284,7 +282,7 @@ public class CSourceVisitor implements ASTVisitor<String> {
 			}
 			return "";
 		}).reduce("", (a, b) -> a + b + ", ");
-		return str.substring(0,str.length()-2);
+		return str.substring(0, str.length() - 2);
 	}
 
 	@Override

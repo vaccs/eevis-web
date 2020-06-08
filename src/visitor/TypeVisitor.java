@@ -46,10 +46,13 @@ import util.X86_64Architecture;
 public class TypeVisitor implements ASTVisitor<Integer> {
 
 	HashMap<String, Integer> typeTable = new HashMap<String, Integer>(); // map from variable names to declared types
-	ArchitectureType arch; // the target architecture for the type checking, this determines the types for constant values in this phase
+	ArchitectureType arch; // the target architecture for the type checking, this determines the types for
+							// constant values in this phase
 
 	/**
-	 * Create a new TypeVisitor object to do type checking for a particular architecture
+	 * Create a new TypeVisitor object to do type checking for a particular
+	 * architecture
+	 * 
 	 * @param archType the target architecture
 	 * @throws CException if there a type error
 	 */
@@ -66,20 +69,19 @@ public class TypeVisitor implements ASTVisitor<Integer> {
 	}
 
 	private void convertOperands(BinaryExpression n, int leftType, int rightType) {
-		int cType = CTypeTables.getConvertedType(arch,leftType,rightType);
-		short rule = CTypeTables.getConversionRule(arch,leftType,rightType);
-		n.getLeftOperand().setConvertedType(cType,rule);
-		n.getRightOperand().setConvertedType(cType,rule);
+		int cType = CTypeTables.getConvertedType(arch, leftType, rightType);
+		short rule = CTypeTables.getConversionRule(arch, leftType, rightType);
+		n.getLeftOperand().setConvertedType(cType, rule);
+		n.getRightOperand().setConvertedType(cType, rule);
 	}
 
 	private int typeCheckExpression(BinaryExpression n) throws CException {
 		int leftType = (int) n.getLeftOperand().accept(this);
 		int rightType = (int) n.getRightOperand().accept(this);
 
-		promoteOperands(n,leftType,rightType);
+		promoteOperands(n, leftType, rightType);
 
-		convertOperands(n,n.getLeftOperand().getPromotedType(),
-				n.getRightOperand().getPromotedType());
+		convertOperands(n, n.getLeftOperand().getPromotedType(), n.getRightOperand().getPromotedType());
 
 		n.setRealType(CTypeTables.getResultingType(n.getLeftOperand().getConvertedType(),
 				n.getRightOperand().getConvertedType()));
@@ -87,12 +89,16 @@ public class TypeVisitor implements ASTVisitor<Integer> {
 		return n.getRealType();
 
 	}
+
 	/*
 	 * (non-Javadoc)
 	 *
-	 * Perform type checking on the left and right operand of an Add expression. The fields convertedType and the realType will be the same if no type
-	 * coercion needs to be done. If type coercion needs to be done because of C semantics, convertedType should hold the type after coercion.
-	 * The type coercion table is in CTypeTables.expressionTable
+	 * Perform type checking on the left and right operand of an Add expression. The
+	 * fields convertedType and the realType will be the same if no type coercion
+	 * needs to be done. If type coercion needs to be done because of C semantics,
+	 * convertedType should hold the type after coercion. The type coercion table is
+	 * in CTypeTables.expressionTable
+	 * 
 	 * @see visitor.Visitor#visit(ast.Add)
 	 */
 	@Override
@@ -103,8 +109,10 @@ public class TypeVisitor implements ASTVisitor<Integer> {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * Perform type checking on the expression on the right hand side and then the variable on the left hand side
-	 * The converted type of the rhs is determined by the variable type on the left-hand side of the assignment
+	 * Perform type checking on the expression on the right hand side and then the
+	 * variable on the left hand side The converted type of the rhs is determined by
+	 * the variable type on the left-hand side of the assignment
+	 * 
 	 * @see visitor.Visitor#visit(ast.Assignment)
 	 */
 	@Override
@@ -159,8 +167,9 @@ public class TypeVisitor implements ASTVisitor<Integer> {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * Determine whether the integer constant requires a long or an int for storage. NOTYPE is returned if the value does not
-	 * fit in the range for a long.
+	 * Determine whether the integer constant requires a long or an int for storage.
+	 * NOTYPE is returned if the value does not fit in the range for a long.
+	 * 
 	 * @see visitor.Visitor#visit(ast.Constant)
 	 */
 	@Override
@@ -194,9 +203,12 @@ public class TypeVisitor implements ASTVisitor<Integer> {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * Perform type checking on the left and right operand of a Divide expression. The fields convertedType and the realType will be the same if no type
-	 * coercion needs to be done. If type coercion needs to be done because of C semantics, convertedType should hold the type after coercion.
-	 * The type coercion table is in CTypeTables.expressionTable
+	 * Perform type checking on the left and right operand of a Divide expression.
+	 * The fields convertedType and the realType will be the same if no type
+	 * coercion needs to be done. If type coercion needs to be done because of C
+	 * semantics, convertedType should hold the type after coercion. The type
+	 * coercion table is in CTypeTables.expressionTable
+	 * 
 	 * @see visitor.Visitor#visit(ast.Divide)
 	 */
 	@Override
@@ -207,8 +219,9 @@ public class TypeVisitor implements ASTVisitor<Integer> {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * There is no type checking to do on the node. The variable declaration has the type information and that is where
-	 * this id should get added to to typeTable.
+	 * There is no type checking to do on the node. The variable declaration has the
+	 * type information and that is where this id should get added to to typeTable.
+	 * 
 	 * @see visitor.Visitor#visit(ast.IdDecl)
 	 */
 	@Override
@@ -220,6 +233,7 @@ public class TypeVisitor implements ASTVisitor<Integer> {
 	 * (non-Javadoc)
 	 *
 	 * Type check the left-hand-side of an assignment statement
+	 * 
 	 * @see visitor.Visitor#visit(ast.IdDef)
 	 */
 	@Override
@@ -232,13 +246,14 @@ public class TypeVisitor implements ASTVisitor<Integer> {
 
 			return type;
 		} else
-			throw new CException("Undeclared variable: "+n.getId());
+			throw new CException("Undeclared variable: " + n.getId());
 	}
 
 	/*
 	 * (non-Javadoc)
 	 *
 	 * Type check a variable reference
+	 * 
 	 * @see visitor.Visitor#visit(ast.IdRef)
 	 */
 	@Override
@@ -250,13 +265,14 @@ public class TypeVisitor implements ASTVisitor<Integer> {
 
 			return type;
 		} else
-			throw new CException("Undeclared Variable: "+n.getId());
+			throw new CException("Undeclared Variable: " + n.getId());
 	}
 
 	/*
 	 * (non-Javadoc)
 	 *
 	 * Type check a declaration with an initial value
+	 * 
 	 * @see visitor.Visitor#visit(ast.InitializeDecl)
 	 */
 	@Override
@@ -271,9 +287,12 @@ public class TypeVisitor implements ASTVisitor<Integer> {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * Perform type checking on the left and right operand of a Multiply expression. The fields convertedType and the realType will be the same if no type
-	 * coercion needs to be done. If type coercion needs to be done because of C semantics, convertedType should hold the type after coercion.
-	 * The type coercion table is in CTypeTables.expressionTable
+	 * Perform type checking on the left and right operand of a Multiply expression.
+	 * The fields convertedType and the realType will be the same if no type
+	 * coercion needs to be done. If type coercion needs to be done because of C
+	 * semantics, convertedType should hold the type after coercion. The type
+	 * coercion table is in CTypeTables.expressionTable
+	 * 
 	 * @see visitor.Visitor#visit(ast.Multiply)
 	 */
 	@Override
@@ -284,7 +303,8 @@ public class TypeVisitor implements ASTVisitor<Integer> {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * Walk the statements in this program and perform type checking on each statement using the visitor pattern
+	 * Walk the statements in this program and perform type checking on each
+	 * statement using the visitor pattern
 	 *
 	 * @see visitor.Visitor#visit(ast.Program)
 	 */
@@ -303,9 +323,12 @@ public class TypeVisitor implements ASTVisitor<Integer> {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * Perform type checking on the left and right operand of a Subtract expression. The fields convertedType and the realType will be the same if no type
-	 * coercion needs to be done. If type coercion needs to be done because of C semantics, convertedType should hold the type after coercion.
-	 * The type coercion table is in CTypeTables.expressionTable
+	 * Perform type checking on the left and right operand of a Subtract expression.
+	 * The fields convertedType and the realType will be the same if no type
+	 * coercion needs to be done. If type coercion needs to be done because of C
+	 * semantics, convertedType should hold the type after coercion. The type
+	 * coercion table is in CTypeTables.expressionTable
+	 * 
 	 * @see visitor.Visitor#visit(ast.Subtract)
 	 */
 	@Override
@@ -316,7 +339,9 @@ public class TypeVisitor implements ASTVisitor<Integer> {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * This method should not be called since this should be processed in variable declaration or type conversion expression
+	 * This method should not be called since this should be processed in variable
+	 * declaration or type conversion expression
+	 * 
 	 * @see visitor.Visitor#visit(ast.Signed)
 	 */
 	@Override
@@ -325,8 +350,8 @@ public class TypeVisitor implements ASTVisitor<Integer> {
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * Type check a type cast (return the  type)
+	 * (non-Javadoc) Type check a type cast (return the type)
+	 * 
 	 * @see visitor.Visitor#visit(ast.TypeCast)
 	 */
 	@Override
@@ -337,6 +362,7 @@ public class TypeVisitor implements ASTVisitor<Integer> {
 
 		n.setRealType(castType);
 		n.getExpression().setConvertedType(castType);
+		n.getExpression().setPromotedType(n.getExpression().getRealType());
 
 		return n.getRealType();
 	}
@@ -368,7 +394,8 @@ public class TypeVisitor implements ASTVisitor<Integer> {
 
 		int type = (int) n.getOperand().accept(this);
 
-		n.setRealType(CTypeTables.convertToSignedType(type));
+		n.getOperand().setPromotedType(CTypeTables.getPromotedType(type));
+		n.setRealType(CTypeTables.convertToSignedType(n.getOperand().getPromotedType()));
 		n.getOperand().setConvertedType(n.getRealType());
 
 		return n.getRealType();
@@ -382,9 +409,10 @@ public class TypeVisitor implements ASTVisitor<Integer> {
 	@Override
 	public Integer visit(UnaryPlus n) throws CException {
 
-		int type = (int)n.getOperand().accept(this);
+		int type = (int) n.getOperand().accept(this);
 
-		n.setRealType(type);
+		n.getOperand().setPromotedType(CTypeTables.getPromotedType(type));
+		n.setRealType(n.getOperand().getPromotedType());
 		n.getOperand().setConvertedType(type);
 
 		return type;
@@ -393,7 +421,9 @@ public class TypeVisitor implements ASTVisitor<Integer> {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * This method should not be called since this should be processed in variable declaration or type conversion expression
+	 * This method should not be called since this should be processed in variable
+	 * declaration or type conversion expression
+	 * 
 	 * @see visitor.Visitor#visit(ast.Unsigned)
 	 */
 	@Override
@@ -404,8 +434,9 @@ public class TypeVisitor implements ASTVisitor<Integer> {
 	/*
 	 * (non-Javadoc)
 	 *
-	 * Determine the type from the type specification, then walk the list of variables defined and add the type of the
-	 * variables to typeTable
+	 * Determine the type from the type specification, then walk the list of
+	 * variables defined and add the type of the variables to typeTable
+	 * 
 	 * @see visitor.Visitor#visit(ast.VariableDeclaration)
 	 */
 	@Override
@@ -413,11 +444,11 @@ public class TypeVisitor implements ASTVisitor<Integer> {
 		Integer declaredType = (Integer) n.getTypeSpecification().accept(this);
 
 		for (ASTNode d : n.getDecls()) {
-			String id = ((CDeclaration)d).getId();
-			typeTable.put(id,declaredType);
+			String id = ((CDeclaration) d).getId();
+			typeTable.put(id, declaredType);
 
 			if (d instanceof InitializeDecl)
-				d.setRealType((int)((InitializeDecl)d).accept(this));
+				d.setRealType((int) ((InitializeDecl) d).accept(this));
 			else
 				d.setRealType(declaredType);
 
