@@ -9,7 +9,6 @@ import ast.CByte;
 import ast.CInt;
 import ast.CLong;
 import ast.CShort;
-import ast.CTypeName;
 import ast.Constant;
 import ast.Divide;
 import ast.IdDecl;
@@ -44,10 +43,11 @@ public class EquationSourceVisitor implements ASTVisitor<String> {
 	public EquationSourceVisitor() throws CException {
 	}
 
-	private String wrapParens(ASTNode n,String str) {
+	private String wrapParens(ASTNode n, String str) {
 		return n.getParens() ? "(" + str + ")" : str;
 
 	}
+
 	/*
 	 * (non-Javadoc)
 	 *
@@ -56,7 +56,7 @@ public class EquationSourceVisitor implements ASTVisitor<String> {
 	@Override
 	public String visit(Add n) throws CException {
 
-		return wrapParens(n,n.getLeftOperand().accept(this) + " + " + n.getRightOperand().accept(this));
+		return wrapParens(n, n.getLeftOperand().accept(this) + " + " + n.getRightOperand().accept(this));
 	}
 
 	/*
@@ -66,7 +66,7 @@ public class EquationSourceVisitor implements ASTVisitor<String> {
 	 */
 	@Override
 	public String visit(Assignment n) throws CException {
-		return wrapParens(n,n.getLhs().accept(this) + " = " + n.getRhs().accept(this));
+		return wrapParens(n, n.getLhs().accept(this) + " = " + n.getRhs().accept(this));
 	}
 
 	/*
@@ -108,7 +108,7 @@ public class EquationSourceVisitor implements ASTVisitor<String> {
 	 */
 	@Override
 	public String visit(Constant n) throws CException {
-		return wrapParens(n,n.getLabel());
+		return wrapParens(n, n.getLabel());
 	}
 
 	/*
@@ -128,7 +128,7 @@ public class EquationSourceVisitor implements ASTVisitor<String> {
 	 */
 	@Override
 	public String visit(Divide n) throws CException {
-		return wrapParens(n,n.getLeftOperand().accept(this) + " / " + n.getRightOperand().accept(this));
+		return wrapParens(n, n.getLeftOperand().accept(this) + " / " + n.getRightOperand().accept(this));
 	}
 
 	/*
@@ -158,7 +158,7 @@ public class EquationSourceVisitor implements ASTVisitor<String> {
 	 */
 	@Override
 	public String visit(IdRef n) throws CException {
-		return wrapParens(n,n.getLabel());
+		return wrapParens(n, n.getLabel());
 	}
 
 	/*
@@ -178,7 +178,7 @@ public class EquationSourceVisitor implements ASTVisitor<String> {
 	 */
 	@Override
 	public String visit(Multiply n) throws CException {
-		return wrapParens(n,n.getLeftOperand().accept(this) + " * " + n.getRightOperand().accept(this));
+		return wrapParens(n, n.getLeftOperand().accept(this) + " * " + n.getRightOperand().accept(this));
 	}
 
 	/*
@@ -190,7 +190,7 @@ public class EquationSourceVisitor implements ASTVisitor<String> {
 	public String visit(Program n) throws CException {
 
 		List<Statement> sl = n.getStatements();
-		return (String) sl.get(sl.size()-1).accept(this);
+		return (String) sl.get(sl.size() - 1).accept(this);
 	}
 
 	/*
@@ -200,7 +200,7 @@ public class EquationSourceVisitor implements ASTVisitor<String> {
 	 */
 	@Override
 	public String visit(Subtract n) throws CException {
-		return wrapParens(n,n.getLeftOperand().accept(this) + " - " + n.getRightOperand().accept(this));
+		return wrapParens(n, n.getLeftOperand().accept(this) + " - " + n.getRightOperand().accept(this));
 	}
 
 	/*
@@ -220,7 +220,7 @@ public class EquationSourceVisitor implements ASTVisitor<String> {
 	 */
 	@Override
 	public String visit(TypeCast n) throws CException {
-		return wrapParens(n,"(" + n.getCastType().accept(this) + ")");
+		return wrapParens(n, "(" + n.getCastType().accept(this) + ")") + n.getExpression().accept(this);
 	}
 
 	/*
@@ -240,7 +240,7 @@ public class EquationSourceVisitor implements ASTVisitor<String> {
 	 */
 	@Override
 	public String visit(UnaryMinus n) throws CException {
-		return wrapParens(n,"-" + n.getOperand().accept(this));
+		return wrapParens(n, "-" + n.getOperand().accept(this));
 	}
 
 	/*
@@ -250,7 +250,7 @@ public class EquationSourceVisitor implements ASTVisitor<String> {
 	 */
 	@Override
 	public String visit(UnaryPlus n) throws CException {
-		return wrapParens(n,"+" + n.getOperand().accept(this));
+		return wrapParens(n, "+" + n.getOperand().accept(this));
 	}
 
 	/*
