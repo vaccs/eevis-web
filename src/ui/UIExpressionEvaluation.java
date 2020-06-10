@@ -357,7 +357,7 @@ public class UIExpressionEvaluation extends Application {
       try {
         Alert info = new Alert(AlertType.INFORMATION);
         info.setTitle("Download eevis Dialog");
-        info.setHeaderText("A new version of eevis wil download and install");
+        info.setHeaderText("A new version of eevis will download and install");
         info.setContentText("This may take awhile and eevis will restart when done");
         info.showAndWait();
         String dir = jarDir + System.getProperty("file.separator");
