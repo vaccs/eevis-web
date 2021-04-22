@@ -1,0 +1,61 @@
+
+> Configure project :
+Project : => 'org.openjfx.gradle.javafx.test' Java module
+
+> Task :generateGrammarSource UP-TO-DATE
+
+> Task :compileJava
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: /Users/carr/git/eevis-web/src/main/java/org/vaccs/eevis/ui/UIExpressionEvaluation.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :processResources UP-TO-DATE
+> Task :classes
+> Task :prepareBrowser
+
+> Task :jproRun
+/Users/carr/git/eevis-web/RUNNING_PID already exists. Process with pid: 54559 is terminated. A new process is getting created.
+Unable to stop the existing process. Now killing forcefully.
+now trying hardkill
+
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by com.google.inject.internal.cglib.core.$ReflectUtils$1 (file:/Users/carr/.gradle/caches/modules-2/files-2.1/com.google.inject/guice/4.2.3/2ea992d6d7bdcac7a43111a95d182a4c42eb5ff7/guice-4.2.3.jar) to method java.lang.ClassLoader.defineClass(java.lang.String,byte[],int,int,java.security.ProtectionDomain)
+WARNING: Please consider reporting this to the maintainers of com.google.inject.internal.cglib.core.$ReflectUtils$1
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+[[37minfo[0m] a.e.s.Slf4jLogger - Slf4jLogger started
+[[37minfo[0m] play.api.Play - Application started (Prod) (no global state)
+[[37minfo[0m] p.c.s.AkkaHttpServer - Enabling HTTP/2 on Akka HTTP server...
+[[37minfo[0m] p.c.s.AkkaHttpServer - Listening for HTTP on /0:0:0:0:0:0:0:0:8080
+[[37minfo[0m] c.jpro.activity - Starting the server
+[[37minfo[0m] c.j.i.s.Initializer$ -  *** Starting JPro: https://www.jpro.one/ ***
+[[37minfo[0m] c.j.i.s.Initializer$ - OS: Mac OS X
+[[37minfo[0m] c.j.i.s.Initializer$ - JPro: 2020.1.6
+[[37minfo[0m] c.j.i.s.Initializer$ - Java version: 12.0.1
+[[37minfo[0m] c.j.i.s.Initializer$ - JVM: 12.0.1 Oracle Corporation
+[[37minfo[0m] c.j.i.s.Initializer$ - redirected OUT / ERR
+[[37minfo[0m] c.j.i.s.Initializer$ - installed SLF4JBridge
+[[37minfo[0m] c.j.i.s.MonocleInitializer$ - screen: null
+[[37minfo[0m] c.j.i.s.Initializer$ - finished init!
+[[37minfo[0m] c.j.i.s.Initializer$ - JavaFX version: 15.0.1.1-jpro+0-2021-01-03-134129
+[[37minfo[0m] c.j.i.c.m.ChartJSONImExporter - Nothing to import
+[[37minfo[0m] c.j.i.c.m.DynamicDataModel - Started Monitoring chart data...
+[[33mwarn[0m] c.jpro - jpro.plainFile - Couldn't get resource for: 'jpro/html/favicon.ico'
+[[37minfo[0m] c.jpro - application requested: 0!hellojpro
+[[37minfo[0m] c.jpro - Creating Application: 0!hellojpro
+[[37minfo[0m] c.jpro - remoteAddress 127.0.0.1
+[[37minfo[0m] c.jpro - host          localhost:8080
+[[37minfo[0m] c.jpro - uri           /app/0!hellojpro
+[[37minfo[0m] c.j.i.s.ViewSerializerActor - appdef: AppByMain(hellojpro,com.jpro.hellojpro.HelloJProFXML,None,NamedClassLoader(system),false) clientinfo: ClientInfo(http://localhost:8080/,http://localhost:8080/app/hellojpro,1819.0,899.0,false,en-US,List(en-US, en),,Map(),Map(Host -> List(localhost:8080), Accept -> List(*/*), Origin -> List(http://localhost:8080), Pragma -> List(no-cache), Sec-GPC -> List(1), Upgrade -> List(websocket), Connection -> List(keep-alive, Upgrade), User-Agent -> List(Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:87.0) Gecko/20100101 Firefox/87.0), Cache-Control -> List(no-cache), Remote-Address -> List(127.0.0.1:52761), Timeout-Access -> List(<function1>), Accept-Encoding -> List(gzip, deflate), Accept-Language -> List(en-US,en;q=0.5), Raw-Request-URI -> List(/app/0!hellojpro), Tls-Session-Info -> List(Session(1619110557583|SSL_NULL_WITH_NULL_NULL)), Sec-WebSocket-Key -> List(DnsRrcTWeuxn0HTsd7EEWw==), UpgradeToWebSocket -> List(), Sec-WebSocket-Version -> List(13), Sec-WebSocket-Extensions -> List(permessage-deflate)))out: Actor[akka://application/system/Materializers/StreamSupervisor-0/$$g-actorRefSource#-405034596]
+[[37minfo[0m] com.jpro.JS - received msg: new MainID: 201 userid: 1331115194
+[[37minfo[0m] c.j.i.s.ViewInfo$ - 
+[[37minfo[0m] c.j.i.s.ViewInfo$ - Application closed:
+[[37minfo[0m] c.j.i.s.ViewInfo$ - startTime      : Thu Apr 22 12:56:08 EDT 2021      
+[[37minfo[0m] c.j.i.s.ViewInfo$ - averageLatency : 00:00:00.002 
+[[37minfo[0m] c.j.i.s.ViewInfo$ - averageJitter  : 00:00:00.000  
+[[37minfo[0m] c.j.i.s.ViewInfo$ - framerateServer: 00:00:00.000
+[[37minfo[0m] c.j.i.s.ViewInfo$ - framerateClient: 00:00:00.000
+[[37minfo[0m] c.j.i.s.ViewInfo$ - raw            : 250644
+[[37minfo[0m] c.j.i.s.ViewInfo$ - zipped         : 79562
+[[37minfo[0m] c.j.i.s.ViewInfo$ - 
