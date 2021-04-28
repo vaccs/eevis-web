@@ -41,7 +41,6 @@ repositories {
   mavenCentral()
 }
 
-
 dependencies {
     antlr "org.antlr:antlr4:4.7.2"
 }
@@ -65,7 +64,7 @@ clean.doLast {
 
 
 javafx {
-    version = '15.0.1'
+    version='15.0.1'
     modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls', 'javafx.fxml', 'javafx.media', 'javafx.web' ]
 }
 

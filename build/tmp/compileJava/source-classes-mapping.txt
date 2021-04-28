@@ -234,6 +234,8 @@ com/jpro/hellojpro/HelloJProFXML.java
  com.jpro.hellojpro.HelloJProFXML
 org/vaccs/eevis/ast/Assignment.java
  org.vaccs.eevis.ast.Assignment
+org/vaccs/eevis/ast/CInt.java
+ org.vaccs.eevis.ast.CInt
 org/vaccs/eevis/ast/UnaryPlus.java
  org.vaccs.eevis.ast.UnaryPlus
 com/jpro/eevis/ExpressionEvaluation.java
@@ -304,8 +306,8 @@ org/vaccs/eevis/iloc/bytecopy/Ub2sInstruction.java
  org.vaccs.eevis.iloc.bytecopy.Ub2sInstruction
 org/vaccs/eevis/iloc/operand/LongOperand.java
  org.vaccs.eevis.iloc.operand.LongOperand
-module-info.java
- module-info
+org/vaccs/eevis/iloc/longcopy/Ul2ulInstruction.java
+ org.vaccs.eevis.iloc.longcopy.Ul2ulInstruction
 org/vaccs/eevis/iloc/shortcopy/Us2sInstruction.java
  org.vaccs.eevis.iloc.shortcopy.Us2sInstruction
 org/vaccs/eevis/ast/IdDecl.java
@@ -336,13 +338,8 @@ org/vaccs/eevis/parser/CBaseVisitor.java
  org.vaccs.eevis.parser.CBaseVisitor
 org/vaccs/eevis/iloc/longcopy/L2usInstruction.java
  org.vaccs.eevis.iloc.longcopy.L2usInstruction
-com/jpro/eevis/UIExpressionEvaluation.java
- com.jpro.eevis.UIExpressionEvaluation
- com.jpro.eevis.UIExpressionEvaluation$1
- com.jpro.eevis.UIExpressionEvaluation$2
- com.jpro.eevis.UIExpressionEvaluation$3
- com.jpro.eevis.UIExpressionEvaluation$4
- com.jpro.eevis.UIExpressionEvaluation$Variable
+org/vaccs/eevis/iloc/shortcopy/Us2ubInstruction.java
+ org.vaccs.eevis.iloc.shortcopy.Us2ubInstruction
 org/vaccs/eevis/iloc/intcopy/Ui2bInstruction.java
  org.vaccs.eevis.iloc.intcopy.Ui2bInstruction
 org/vaccs/eevis/iloc/operand/IntOperand.java
@@ -359,9 +356,14 @@ org/vaccs/eevis/iloc/operand/OperandFactory.java
  org.vaccs.eevis.iloc.operand.OperandFactory
 org/vaccs/eevis/iloc/shortcopy/S2usInstruction.java
  org.vaccs.eevis.iloc.shortcopy.S2usInstruction
-org/vaccs/eevis/ast/CInt.java
- org.vaccs.eevis.ast.CInt
-org/vaccs/eevis/iloc/longcopy/Ul2ulInstruction.java
- org.vaccs.eevis.iloc.longcopy.Ul2ulInstruction
-org/vaccs/eevis/iloc/shortcopy/Us2ubInstruction.java
- org.vaccs.eevis.iloc.shortcopy.Us2ubInstruction
+com/jpro/eevis/UIExpressionEvaluation.java
+ com.jpro.eevis.UIExpressionEvaluation
+ com.jpro.eevis.UIExpressionEvaluation$1
+ com.jpro.eevis.UIExpressionEvaluation$2
+ com.jpro.eevis.UIExpressionEvaluation$3
+ com.jpro.eevis.UIExpressionEvaluation$4
+ com.jpro.eevis.UIExpressionEvaluation$Variable
+module-info.java
+ module-info
+org/vaccs/eevis/util/FileHandler.java
+ org.vaccs.eevis.util.FileHandler

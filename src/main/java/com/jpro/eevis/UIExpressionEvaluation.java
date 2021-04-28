@@ -9,15 +9,19 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.lang.management.ManagementFactory;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.vaccs.eevis.driver.CExpr;
-import javafx.application.Application;
+import org.vaccs.eevis.util.FileHandler;
+
+import com.jpro.webapi.WebAPI;
+import com.jpro.webapi.JProApplication;
+
 import javafx.beans.value.*;
 import javafx.collections.*;
 import javafx.geometry.*;
@@ -30,9 +34,10 @@ import javafx.scene.layout.*;
 import javafx.scene.text.*;
 import javafx.stage.*;
 
-public class UIExpressionEvaluation extends Application {
+public class UIExpressionEvaluation extends JProApplication {
 
-  FileChooser fileChooser, fileChooserSave;
+  // FileChooser fileChooser, fileChooserSave;
+  FileHandler fileLoadHandler;
 
   private ExpressionEvaluation ev;
   private Label lblEquation;
@@ -41,10 +46,6 @@ public class UIExpressionEvaluation extends Application {
   private VBox boxBuildEquation = new VBox();
   private GridPane buildEquationContainer = new GridPane();
   private TextField txtEquation;
-  private String currentVersion = "";
-  private String versionURL;
-  private String tgzURL;
-  private String javafxVersion = "javafx-sdk-11.0.2";
 
   public static void main(String[] args) {
     // redirect stderr
@@ -65,66 +66,6 @@ public class UIExpressionEvaluation extends Application {
   @Override
   public void start(Stage primaryStage) throws IOException {
 
-    versionURL = "https://github.com/vaccs/eevis-" + getOS() + "/blob/master/version.txt";
-    tgzURL = "https://github.com/vaccs/eevis-" + getOS() + "/archive/";
-
-    fileChooser = new FileChooser();
-    FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Equation files (*.eevis)", "*.eevis");
-    fileChooser.getExtensionFilters().add(extFilter);
-    fileChooser.setTitle("Load Equation");
-
-    fileChooserSave = new FileChooser();
-    FileChooser.ExtensionFilter extFilterSave = new FileChooser.ExtensionFilter("Equation files (*.eevis)", "*.eevis");
-    fileChooserSave.getExtensionFilters().add(extFilterSave);
-    fileChooserSave.setTitle("Save Equation");
-    // View menu
-    Menu viewMenu = new Menu("Menu");
-
-    // MenuItem checkForUpdates = new MenuItem("Check for Updates");
-    // checkForUpdates.setOnAction(e -> {
-    //   HttpsUtils hUtil = new HttpsUtils();
-    //   String latestVersion = "";
-    //   try {
-    //     latestVersion = parseHTMLDataForVersion(hUtil.getDataFileContents(versionURL));
-    //   } catch (IOException e1) {
-    //     latestVersion = currentVersion;
-    //   }
-    //   try {
-    //     if (latestIsNewer(latestVersion)) {
-    //       askForDownload(hUtil, latestVersion);
-    //       return;
-    //     }
-    //   } catch (URISyntaxException | IOException e1) {
-    //   }
-
-    //   Alert info = new Alert(AlertType.INFORMATION);
-    //   info.setTitle("Check eevis version Dialog");
-    //   info.setHeaderText("Your version is up-to-date.");
-    //   info.setContentText("No eevis update needed.");
-    //   info.showAndWait();
-
-    // });
-    // viewMenu.getItems().add(checkForUpdates);
-    // Main menu bar
-    MenuBar menuBar = new MenuBar();
-    menuBar.getMenus().addAll(viewMenu);
-
-    MenuItem menuQuit = new MenuItem("Quit");
-    menuQuit.setOnAction(e -> {
-      ButtonType yesButtonType = new ButtonType("Yes", ButtonData.YES);
-      ButtonType noButtonType = new ButtonType("No", ButtonData.NO);
-      Dialog<ButtonType> dialog = new Dialog<>();
-      dialog.setTitle("Quit eevis Dialog");
-      dialog.setContentText("Do you want to quit eevis?");
-      dialog.getDialogPane().getButtonTypes().add(noButtonType);
-      dialog.getDialogPane().getButtonTypes().add(yesButtonType);
-      boolean disabled = false; // computed based on content of text fields, for example
-      dialog.getDialogPane().lookupButton(yesButtonType).setDisable(disabled);
-      dialog.getDialogPane().lookupButton(noButtonType).setDisable(disabled);
-      dialog.showAndWait().filter(response -> response.getText() == "Yes").ifPresent(response -> System.exit(0));
-    });
-    viewMenu.getItems().add(menuQuit);
-
     primaryStage.setTitle("Expression Evaluation Vis");
 
     Image image = new Image("file:assets/ConversionRules.png");
@@ -135,11 +76,22 @@ public class UIExpressionEvaluation extends Application {
     imv.setCache(true);
     // imv.setFitWidth(100);
 
-    Button btnLoad = new Button("Load Equation");
-    btnLoad.setStyle("-fx-font-size: 16;");
-    btnLoad.setPadding(new Insets(10, 10, 10, 10));
+    // uploadLabel.getStyleClass().add("file-handler");
+
+    fileLoadHandler = new FileHandler(getWebAPI());
+
+    Button btnLoad = new Button("Use Equation");
+    btnLoad.setDisable(true); // this is disabled until the file is complete loaded
+    //btnLoad.setStyle("-fx-font-size: 16;");
+    //btnLoad.setPadding(new Insets(10, 10, 10, 10));
     btnLoad.setOnAction(e -> {
-      File file = fileChooser.showOpenDialog(primaryStage);
+      try {
+        getWebAPI().downloadURL(fileLoadHandler.fileHandler.getUploadedFile().toURI().toURL());
+      } catch (MalformedURLException e1) {
+        // TODO Auto-generated catch block
+        e1.printStackTrace();
+      }
+      File file = fileLoadHandler.fileHandler.getUploadedFile();
       if (file != null) {
         String absolutePath = file.getAbsolutePath();
         try {
@@ -154,8 +106,19 @@ public class UIExpressionEvaluation extends Application {
         }
       }
     });
+
+    fileLoadHandler.fileHandler.progressProperty().addListener((obs, oldV, newV) -> {
+      if (newV.doubleValue() == 1.0) {
+        btnLoad.setDisable(false);
+      }
+    });
+
+    VBox loadEquationBox = new VBox(fileLoadHandler, btnLoad);
+    loadEquationBox.setSpacing(50);
+    loadEquationBox.setAlignment(Pos.CENTER);
+
     Tooltip tipLoad = new Tooltip("Select an equation analysis file to load");
-    Tooltip.install(btnLoad, tipLoad);
+    Tooltip.install(loadEquationBox, tipLoad);
 
     lblEquation = new Label("-----");
     lblEquation.setStyle("-fx-font-size: 16;");
@@ -171,7 +134,7 @@ public class UIExpressionEvaluation extends Application {
 
     GridPane subLayout = new GridPane();
     subLayout.add(createCell(lblEquation, "#000000", "#ffffff", ""), 0, 0, 1, 1);
-    subLayout.add(btnLoad, 1, 0, 1, 1);
+    subLayout.add(loadEquationBox, 1, 0, 1, 1);
     subLayout.setPadding(new Insets(10, 10, 10, 10));
 
     boxBuildEquation = new VBox();
@@ -246,10 +209,13 @@ public class UIExpressionEvaluation extends Application {
     Tooltip tipEvaluate = new Tooltip("Perform and display analysis of the custom equation you have set up");
     Tooltip.install(btnEvaluate, tipEvaluate);
 
+    // fileSaveHandler = webAPI.makeFileUploadNode(uploadLabel);
+    // fileSaveHandler.setSelectFileOnClick(true);
+
     Button btnSave = new Button("Save");
     btnSave.setStyle("-fx-font-size: 16;");
     btnSave.setOnAction(e -> {
-      File file = fileChooserSave.showSaveDialog(primaryStage);
+      File file = null;// new File(fileSaveHandler.getSelectedFile());
       if (file != null) {
         String absolutePath = file.getAbsolutePath();
         saveFile(absolutePath);
@@ -314,97 +280,13 @@ public class UIExpressionEvaluation extends Application {
     scrollPane.setFitToHeight(true);
 
     BorderPane root = new BorderPane(scrollPane);
-    root.setTop(menuBar);
     root.setPadding(new Insets(1));
     root.setCenter(layout);
 
-    primaryStage.setScene(new Scene(root));
+    Scene scene = new Scene(root, 500, 500);
+    root.getStylesheets().add(getClass().getResource("/com/jpro/hellojpro/css/filehandler.css").toExternalForm());
+    primaryStage.setScene(scene);
     primaryStage.show();
-  }
-
-  private String parseHTMLDataForVersion(String dataFileContents) {
-    String version = currentVersion;
-    int index = dataFileContents.indexOf("<td id=\"LC1\"");
-    String rest = dataFileContents.substring(index);
-    index = rest.indexOf('>');
-    version = rest.substring(index + 1, rest.indexOf("</td>"));
-
-    return version;
-  }
-
-  // private void askForDownload(HttpsUtils hUtil, String newVersion) {
-
-  //   ButtonType yesButtonType = new ButtonType("Yes", ButtonData.YES);
-  //   ButtonType noButtonType = new ButtonType("No", ButtonData.NO);
-  //   Dialog<ButtonType> dialog = new Dialog<>();
-  //   dialog.setTitle("New eevis Version Dialog");
-  //   dialog.setContentText("A new version (" + newVersion + ") of eevis is available. Do you want to install it?");
-  //   dialog.getDialogPane().getButtonTypes().add(noButtonType);
-  //   dialog.getDialogPane().getButtonTypes().add(yesButtonType);
-  //   boolean disabled = false; // computed based on content of text fields, for example
-  //   dialog.getDialogPane().lookupButton(yesButtonType).setDisable(disabled);
-  //   dialog.getDialogPane().lookupButton(noButtonType).setDisable(disabled);
-  //   dialog.showAndWait().filter(response -> response.getText() == "Yes").ifPresent(response -> {
-  //     String jarDir = "";
-  //     try {
-  //       jarDir = new File(UIExpressionEvaluation.class.getProtectionDomain().getCodeSource().getLocation().toURI())
-  //           .getParent();
-  //     } catch (URISyntaxException e) {
-  //       Alert info = new Alert(AlertType.INFORMATION);
-  //       info.setTitle("Download eevis Dialog");
-  //       info.setHeaderText("Unable to determine installation directory automatically.");
-  //       info.setContentText("New eevis not installed.");
-  //       info.showAndWait();
-  //       return;
-  //     }
-  //     try {
-  //       Alert info = new Alert(AlertType.INFORMATION);
-  //       info.setTitle("Download eevis Dialog");
-  //       info.setHeaderText("A new version of eevis will download and install");
-  //       info.setContentText("This may take awhile and eevis will restart when done");
-  //       info.showAndWait();
-  //       String dir = jarDir + System.getProperty("file.separator");
-  //       hUtil.getTarGzipFile(tgzURL + newVersion + ".tar.gz", dir, javafxVersion, true);
-  //       restartApplication();
-  //     } catch (IOException e) {
-  //       Alert info = new Alert(AlertType.INFORMATION);
-  //       info.setTitle("Download eevis Dialog");
-  //       info.setHeaderText("Error downloading and installing new version of eevis");
-  //       info.setContentText("Installation failed.\n" + jarDir + System.getProperty("file.separator") + "\n" + tgzURL
-  //           + newVersion + ".tar.gz");
-  //       info.showAndWait();
-  //       return;
-  //     }
-  //   });
-
-  // }
-
-  private boolean latestIsNewer(String latestVersion) throws URISyntaxException, IOException {
-    String dir = new File(UIExpressionEvaluation.class.getProtectionDomain().getCodeSource().getLocation().toURI())
-        .getParent();
-    currentVersion = Files.readString(Paths.get(dir, "version.txt")).strip();
-    String[] latestVersionParts = latestVersion.split("\\.");
-    String[] currentVersionParts = currentVersion.split("\\.");
-
-    int latestVersionNum = Integer.parseInt(latestVersionParts[0]) * 10000
-        + Integer.parseInt(latestVersionParts[1]) * 100 + Integer.parseInt(latestVersionParts[2]);
-    int currentVersionNum = Integer.parseInt(currentVersionParts[0]) * 10000
-        + Integer.parseInt(currentVersionParts[1]) * 100 + Integer.parseInt(currentVersionParts[2]);
-
-    return latestVersionNum > currentVersionNum;
-  }
-
-  private static String getOS() {
-    switch (System.getProperty("os.name")) {
-      case "Mac OS X":
-        return "MacOS";
-      case "Linux":
-        return "Linux";
-      case "Windows 10":
-        return "Windows";
-      default:
-        return "unsupportedOS";
-    }
   }
 
   private String loadFile(String absolutePath) {
