@@ -10,16 +10,12 @@ import java.io.PrintStream;
 import java.io.StringReader;
 import java.lang.management.ManagementFactory;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.vaccs.eevis.driver.CExpr;
 import org.vaccs.eevis.util.FileHandler;
 
-import com.jpro.webapi.WebAPI;
 import com.jpro.webapi.JProApplication;
 
 import javafx.beans.value.*;
@@ -78,12 +74,12 @@ public class UIExpressionEvaluation extends JProApplication {
 
     // uploadLabel.getStyleClass().add("file-handler");
 
-    fileLoadHandler = new FileHandler(getWebAPI());
+    fileLoadHandler = new FileHandler(getWebAPI(), "Click, or Drag-and-Drop Equation", true);
 
     Button btnLoad = new Button("Use Equation");
-    btnLoad.setDisable(true); // this is disabled until the file is complete loaded
-    //btnLoad.setStyle("-fx-font-size: 16;");
-    //btnLoad.setPadding(new Insets(10, 10, 10, 10));
+    btnLoad.setDisable(true); // this is disabled until the file is completely loaded
+    // btnLoad.setStyle("-fx-font-size: 16;");
+    // btnLoad.setPadding(new Insets(10, 10, 10, 10));
     btnLoad.setOnAction(e -> {
       try {
         getWebAPI().downloadURL(fileLoadHandler.fileHandler.getUploadedFile().toURI().toURL());
@@ -113,15 +109,13 @@ public class UIExpressionEvaluation extends JProApplication {
       }
     });
 
-    VBox loadEquationBox = new VBox(fileLoadHandler, btnLoad);
+    VBox loadEquationBox = new VBox(1.0, fileLoadHandler, btnLoad);
     loadEquationBox.setSpacing(50);
     loadEquationBox.setAlignment(Pos.CENTER);
 
     Tooltip tipLoad = new Tooltip("Select an equation analysis file to load");
     Tooltip.install(loadEquationBox, tipLoad);
 
-    lblEquation = new Label("-----");
-    lblEquation.setStyle("-fx-font-size: 16;");
     // lblEquation.setPadding(new Insets(10, 10, 10, 10));
 
     // tblVariables.setHgap(12);
@@ -132,9 +126,11 @@ public class UIExpressionEvaluation extends JProApplication {
     // tblEvaluation.setVgap(8);
     tblEvaluation.setPadding(new Insets(10, 10, 10, 10));
 
+    lblEquation = new Label("-----");
+    lblEquation.setStyle("-fx-font-size: 18;");
     GridPane subLayout = new GridPane();
     subLayout.add(createCell(lblEquation, "#000000", "#ffffff", ""), 0, 0, 1, 1);
-    subLayout.add(loadEquationBox, 1, 0, 1, 1);
+    subLayout.add(loadEquationBox, 0, 1, 1, 1);
     subLayout.setPadding(new Insets(10, 10, 10, 10));
 
     boxBuildEquation = new VBox();

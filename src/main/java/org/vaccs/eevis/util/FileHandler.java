@@ -6,24 +6,26 @@ import javafx.scene.control.Label;
 public class FileHandler extends Label {
     public WebAPI.FileUploader fileHandler = null;
 
-    public FileHandler(WebAPI webAPI) {
-        setText("Click or Drop File");
+    public FileHandler(WebAPI webAPI, String text, boolean drop) {
+        setText(text);
         getStyleClass().add("file-handler");
         setWrapText(true);
 
         fileHandler = webAPI.makeFileUploadNode(this);
 
         fileHandler.setSelectFileOnClick(true);
-        fileHandler.setSelectFileOnDrop(true);
-        fileHandler.fileDragOverProperty().addListener((o, oldV, newV) -> {
-            if (newV) {
-                getStyleClass().add("file-drag");
-            } else {
-                if (getStyleClass().contains("file-drag")) {
-                    getStyleClass().remove("file-drag");
+        if (drop) {
+            fileHandler.setSelectFileOnDrop(true);
+            fileHandler.fileDragOverProperty().addListener((o, oldV, newV) -> {
+                if (newV) {
+                    getStyleClass().add("file-drag");
+                } else {
+                    if (getStyleClass().contains("file-drag")) {
+                        getStyleClass().remove("file-drag");
+                    }
                 }
-            }
-        });
+            });
+        }
         fileHandler.setOnFileSelected((file) -> {
             updateText();
             fileHandler.uploadFile();
