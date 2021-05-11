@@ -18,6 +18,10 @@ import org.vaccs.eevis.util.FileHandler;
 
 import com.jpro.webapi.JProApplication;
 
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXDialogLayout;
+
 import javafx.beans.value.*;
 import javafx.collections.*;
 import javafx.geometry.*;
@@ -513,20 +517,23 @@ public class UIExpressionEvaluation extends JProApplication {
       // add a popup dialog to confirm yes/no
       ButtonType yesButton = new ButtonType("Yes", ButtonData.YES);
       ButtonType noButton = new ButtonType("No", ButtonData.YES);
-      Dialog<ButtonType> dialog = new Dialog<>();
-      dialog.setTitle("Variable Delete Dialog");
-      dialog.setContentText("Are you sure you want to delete the variable " + customVariables.get(idx).name + "?");
-      dialog.getDialogPane().getButtonTypes().add(yesButton);
-      dialog.getDialogPane().getButtonTypes().add(noButton);
-      boolean disabled = false; // computed based on content of text fields, for example
-      dialog.getDialogPane().lookupButton(yesButton).setDisable(disabled);
-      dialog.getDialogPane().lookupButton(noButton).setDisable(disabled);
-      dialog.showAndWait().filter(response -> response.getText() == "Yes").ifPresent(response -> {
-        customVariables.remove(idx);
-        createdVariables--;
-        row.getChildren().clear();
-        boxBuildEquation.getChildren().remove(row);
-      });
+      // Dialog<ButtonType> dialog = new Dialog<>();
+      // dialog.setTitle("Variable Delete Dialog");
+      // dialog.setContentText("Are you sure you want to delete the variable " +
+      // customVariables.get(idx).name + "?");
+      // dialog.getDialogPane().getButtonTypes().add(yesButton);
+      // dialog.getDialogPane().getButtonTypes().add(noButton);
+      // boolean disabled = false; // computed based on content of text fields, for
+      // example
+      // dialog.getDialogPane().lookupButton(yesButton).setDisable(disabled);
+      // dialog.getDialogPane().lookupButton(noButton).setDisable(disabled);
+      // dialog.showAndWait().filter(response -> response.getText() ==
+      // "Yes").ifPresent(response -> {
+      // customVariables.remove(idx);
+      // createdVariables--;
+      // row.getChildren().clear();
+      // boxBuildEquation.getChildren().remove(row);
+      // });
     });
 
     Tooltip tipXVariable = new Tooltip("Delete this variable");
