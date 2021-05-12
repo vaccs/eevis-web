@@ -66,6 +66,8 @@ public class UIExpressionEvaluation extends JProApplication {
   @Override
   public void start(Stage primaryStage) throws IOException {
 
+    GridPane layout = new GridPane();
+
     primaryStage.setTitle("Expression Evaluation Vis");
 
     Image image = new Image("file:assets/ConversionRules.png");
@@ -98,7 +100,7 @@ public class UIExpressionEvaluation extends JProApplication {
 
           parseEvaluationFromString(CExpr.processCodeFromString("customequation.eevis", loadFile(absolutePath)));
           boxBuildEquation.getChildren().clear();
-          List<HBox> newVariableRows = populateEquationEditor();
+          List<HBox> newVariableRows = populateEquationEditor(layout);
           for (HBox h : newVariableRows)
             boxBuildEquation.getChildren().add(h);
         } catch (Exception ex) {
@@ -244,7 +246,6 @@ public class UIExpressionEvaluation extends JProApplication {
 
     // display
     // /////////////////////////////////////////////////////////////////////////////////////
-    GridPane layout = new GridPane();
 
     // no effect?
     /*
@@ -467,7 +468,7 @@ public class UIExpressionEvaluation extends JProApplication {
     }
   }
 
-  HBox createBuildVariableRow(String name, String type, String value, boolean isNew) {
+  HBox createBuildVariableRow(GridPane gLayout, String name, String type, String value, boolean isNew) {
     if (type != null && type.startsWith("signed "))
       type = type.substring(7, type.length());
     HBox row = new HBox();
@@ -515,7 +516,6 @@ public class UIExpressionEvaluation extends JProApplication {
     btnXVariable.setButtonType(JFXButton.ButtonType.RAISED);
     btnXVariable.setStyle("-fx-font-size: 14;");
     btnXVariable.setOnAction(e -> {
-      JFXDialog dialog = new JFXDialog();
 
       JFXDialogLayout dLayout = new JFXDialogLayout();
       dLayout.setHeading(new Label("Variable Delete Dialog"));
@@ -536,7 +536,7 @@ public class UIExpressionEvaluation extends JProApplication {
       });
 
       dLayout.setActions(yesButton, noButton);
-      dialog.setContent(dLayout);
+      JFXDialog dialog = new JFXDialog(gLayout, dLayout, JFXDialog.DialogTransition.CENTER);
 
       dialog.show();
       // add a popup dialog to confirm yes/no
@@ -611,14 +611,14 @@ public class UIExpressionEvaluation extends JProApplication {
     }
   }
 
-  List<HBox> populateEquationEditor() {
+  List<HBox> populateEquationEditor(GridPane layout) {
     createdVariables = 0;
     List<HBox> newVariableRows = new ArrayList<>();
 
     for (ExpressionEvaluation.VariableRecord record : ev.variableTable) {
       HBox row = new HBox();
 
-      newVariableRows.add(createBuildVariableRow(record.name, record.type, record.value, false));
+      newVariableRows.add(createBuildVariableRow(layout, record.name, record.type, record.value, false));
     }
 
     return newVariableRows;
