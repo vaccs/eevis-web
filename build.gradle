@@ -43,6 +43,7 @@ repositories {
 
 dependencies {
     antlr "org.antlr:antlr4:4.7.2"
+    implementation 'com.jfoenix:jfoenix:9.0.10'
 }
 
 generateGrammarSource {

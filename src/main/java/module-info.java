@@ -4,6 +4,8 @@ module org.openjfx.gradle.javafx.test {
     requires jpro.webapi;
     requires java.management;
 
+    requires com.jfoenix;
+
     exports com.jpro.hellojpro;
     exports com.jpro.eevis;
     exports org.vaccs.eevis.ast;

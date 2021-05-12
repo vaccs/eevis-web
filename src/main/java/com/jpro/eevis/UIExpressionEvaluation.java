@@ -511,12 +511,37 @@ public class UIExpressionEvaluation extends JProApplication {
     });
 
     // add a button to delete the variable
-    Button btnXVariable = new Button("X");
+    JFXButton btnXVariable = new JFXButton("X");
+    btnXVariable.setButtonType(JFXButton.ButtonType.RAISED);
     btnXVariable.setStyle("-fx-font-size: 14;");
     btnXVariable.setOnAction(e -> {
+      JFXDialog dialog = new JFXDialog();
+
+      JFXDialogLayout dLayout = new JFXDialogLayout();
+      dLayout.setHeading(new Label("Variable Delete Dialog"));
+      dLayout.setBody(new Label("Are you sure you want to delete the variable " + customVariables.get(idx).name + "?"));
+
+      JFXButton yesButton = new JFXButton("Yes");
+      yesButton.setOnAction(event -> {
+        customVariables.remove(idx);
+        createdVariables--;
+        row.getChildren().clear();
+        boxBuildEquation.getChildren().remove(row);
+        dialog.close();
+      });
+
+      JFXButton noButton = new JFXButton("No");
+      noButton.setOnAction(event -> {
+        dialog.close();
+      });
+
+      dLayout.setActions(yesButton, noButton);
+      dialog.setContent(dLayout);
+
+      dialog.show();
       // add a popup dialog to confirm yes/no
-      ButtonType yesButton = new ButtonType("Yes", ButtonData.YES);
-      ButtonType noButton = new ButtonType("No", ButtonData.YES);
+      // ButtonType yesButton = new ButtonType("Yes", ButtonData.YES);
+      // ButtonType noButton = new ButtonType("No", ButtonData.YES);
       // Dialog<ButtonType> dialog = new Dialog<>();
       // dialog.setTitle("Variable Delete Dialog");
       // dialog.setContentText("Are you sure you want to delete the variable " +
@@ -639,63 +664,65 @@ public class UIExpressionEvaluation extends JProApplication {
    * @param runBeforeRestart some custom code to be run before restarting
    * @throws IOException
    */
-  private static void restartApplication(/* Runnable runBeforeRestart */) throws IOException {
-    try {
-      // java binary
-      String java = System.getProperty("java.home") + "/bin/java";
-      // vm arguments
-      List<String> vmArguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
-      String vmArgsOneLine = new String();
-      for (String arg : vmArguments) {
-        // if it's the agent argument : we ignore it otherwise the
-        // address of the old application and the new one will be in conflict
-        if (!arg.contains("-agentlib")) {
-          vmArgsOneLine += (arg + " ");
-        }
-      }
-      // init the command to execute, add the vm args
-      String cmd = java + " " + vmArgsOneLine + " ";
+  // private static void restartApplication(/* Runnable runBeforeRestart */)
+  // throws IOException {
+  // try {
+  // // java binary
+  // String java = System.getProperty("java.home") + "/bin/java";
+  // // vm arguments
+  // List<String> vmArguments =
+  // ManagementFactory.getRuntimeMXBean().getInputArguments();
+  // String vmArgsOneLine = new String();
+  // for (String arg : vmArguments) {
+  // // if it's the agent argument : we ignore it otherwise the
+  // // address of the old application and the new one will be in conflict
+  // if (!arg.contains("-agentlib")) {
+  // vmArgsOneLine += (arg + " ");
+  // }
+  // }
+  // // init the command to execute, add the vm args
+  // String cmd = java + " " + vmArgsOneLine + " ";
 
-      // program main and program arguments
-      String[] mainCommand = System.getProperty(SUN_JAVA_COMMAND).split(" ");
-      // program main is a jar
-      cmd += "-jar " + new File(mainCommand[0]).getAbsolutePath();
-      // finally add program arguments
-      for (int i = 1; i < mainCommand.length; i++) {
-        cmd += (" " + (mainCommand[i]));
-      }
-      // execute the command in a shutdown hook, to be sure that all the
-      // resources have been disposed before restarting the application
+  // // program main and program arguments
+  // String[] mainCommand = System.getProperty(SUN_JAVA_COMMAND).split(" ");
+  // // program main is a jar
+  // cmd += "-jar " + new File(mainCommand[0]).getAbsolutePath();
+  // // finally add program arguments
+  // for (int i = 1; i < mainCommand.length; i++) {
+  // cmd += (" " + (mainCommand[i]));
+  // }
+  // // execute the command in a shutdown hook, to be sure that all the
+  // // resources have been disposed before restarting the application
 
-      final String command = cmd;
-      Runtime.getRuntime().addShutdownHook(new Thread() {
-        @Override
-        public void run() {
-          try {
-            Runtime.getRuntime().exec(command);
-          } catch (IOException e) {
-            Alert info = new Alert(AlertType.INFORMATION);
-            info.setTitle("Download eevis Dialog");
-            info.setHeaderText("Error restarting eevis");
-            info.setContentText("Restart manually.");
-            info.showAndWait();
-            return;
-          }
-        }
-      });
-      // execute some custom code before restarting
-      // if (runBeforeRestart != null) {
-      // runBeforeRestart.run();
-      // }
-      // exit
-      System.exit(0);
-    } catch (Exception e) {
-      Alert info = new Alert(AlertType.INFORMATION);
-      info.setTitle("Download eevis Dialog");
-      info.setHeaderText("Error restarting eevis");
-      info.setContentText("Restart manually.");
-      info.showAndWait();
-      return;
-    }
-  }
+  // final String command = cmd;
+  // Runtime.getRuntime().addShutdownHook(new Thread() {
+  // @Override
+  // public void run() {
+  // try {
+  // Runtime.getRuntime().exec(command);
+  // } catch (IOException e) {
+  // Alert info = new Alert(AlertType.INFORMATION);
+  // info.setTitle("Download eevis Dialog");
+  // info.setHeaderText("Error restarting eevis");
+  // info.setContentText("Restart manually.");
+  // info.showAndWait();
+  // return;
+  // }
+  // }
+  // });
+  // // execute some custom code before restarting
+  // // if (runBeforeRestart != null) {
+  // // runBeforeRestart.run();
+  // // }
+  // // exit
+  // System.exit(0);
+  // } catch (Exception e) {
+  // Alert info = new Alert(AlertType.INFORMATION);
+  // info.setTitle("Download eevis Dialog");
+  // info.setHeaderText("Error restarting eevis");
+  // info.setContentText("Restart manually.");
+  // info.showAndWait();
+  // return;
+  // }
+  // }
 }
