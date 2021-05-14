@@ -21,6 +21,7 @@ import com.jpro.webapi.JProApplication;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
+import com.jfoenix.controls.JFXPopup;
 
 import javafx.beans.value.*;
 import javafx.collections.*;
@@ -66,7 +67,7 @@ public class UIExpressionEvaluation extends JProApplication {
   @Override
   public void start(Stage primaryStage) throws IOException {
 
-    GridPane layout = new GridPane();
+    StackPane stackpane = new StackPane();
 
     primaryStage.setTitle("Expression Evaluation Vis");
 
@@ -82,15 +83,17 @@ public class UIExpressionEvaluation extends JProApplication {
 
     fileLoadHandler = new FileHandler(getWebAPI(), "Click, or Drag-and-Drop Equation", true);
 
+    GridPane layout = new GridPane();
+
     Button btnLoad = new Button("Use Equation");
+    btnLoad.setTextAlignment(TextAlignment.CENTER);
     btnLoad.setDisable(true); // this is disabled until the file is completely loaded
-    // btnLoad.setStyle("-fx-font-size: 16;");
-    // btnLoad.setPadding(new Insets(10, 10, 10, 10));
+    btnLoad.setStyle("-fx-font-size: 14;");
+    btnLoad.setPadding(new Insets(10, 15, 10, 10));
     btnLoad.setOnAction(e -> {
       try {
         getWebAPI().downloadURL(fileLoadHandler.fileHandler.getUploadedFile().toURI().toURL());
       } catch (MalformedURLException e1) {
-        // TODO Auto-generated catch block
         e1.printStackTrace();
       }
       File file = fileLoadHandler.fileHandler.getUploadedFile();
@@ -100,7 +103,7 @@ public class UIExpressionEvaluation extends JProApplication {
 
           parseEvaluationFromString(CExpr.processCodeFromString("customequation.eevis", loadFile(absolutePath)));
           boxBuildEquation.getChildren().clear();
-          List<HBox> newVariableRows = populateEquationEditor(layout);
+          List<HBox> newVariableRows = populateEquationEditor(stackpane);
           for (HBox h : newVariableRows)
             boxBuildEquation.getChildren().add(h);
         } catch (Exception ex) {
@@ -148,37 +151,30 @@ public class UIExpressionEvaluation extends JProApplication {
     btnHelp.setOnAction(e -> {
       final Stage helpWindow = new Stage();
       helpWindow.initModality(Modality.WINDOW_MODAL);
-      Button btnOk = new Button("Close");
-      btnOk.setOnAction(ev -> {
-        helpWindow.close();
-      });
-      VBox vbox = new VBox();
-      vbox.getChildren()
-          .addAll(new Text(
-              "To create your own equation, first define the variables that will be used in" + System.lineSeparator()
-                  + "the equation. To define a variable, click the Add Variable button. The text box on the"
-                  + System.lineSeparator()
-                  + "left is where you can give the variable any unique, valid C variable name. You can use the"
-                  + System.lineSeparator()
-                  + "drop-down box to set the variable's type and the text field to enter its initial value."
-                  + System.lineSeparator()
-                  + "All variables require an initial value, even the one being assigned to. You can click the"
-                  + System.lineSeparator()
-                  + "Clear button to remove all variables you have defined. Then, enter your equation in the"
-                  + System.lineSeparator()
-                  + "provided field at the top. The equation must be a single line of valid C that consists of"
-                  + System.lineSeparator()
-                  + "the variables you defined and valid arithmetic operations, such as A = B * C / D + E."
-                  + System.lineSeparator()
-                  + "When you are ready to evaluate your equation, click the Evaluate button. You can save"
-                  + System.lineSeparator() + "the results of your evaluation to a file with the Save button."
-                  + System.lineSeparator()),
-              btnOk);
-      vbox.setAlignment(Pos.CENTER);
-      vbox.setPadding(new Insets(10));
-      Scene helpScene = new Scene(vbox);
+      Label txt = new Label(
+          "To create your own equation, first define the variables that will be used in" + System.lineSeparator()
+              + "the equation. To define a variable, click the Add Variable button. The text box on the"
+              + System.lineSeparator()
+              + "left is where you can give the variable any unique, valid C variable name. You can use the"
+              + System.lineSeparator()
+              + "drop-down box to set the variable's type and the text field to enter its initial value."
+              + System.lineSeparator()
+              + "All variables require an initial value, even the one being assigned to. You can click the"
+              + System.lineSeparator()
+              + "Clear button to remove all variables you have defined. Then, enter your equation in the"
+              + System.lineSeparator()
+              + "provided field at the top. The equation must be a single line of valid C that consists of"
+              + System.lineSeparator()
+              + "the variables you defined and valid arithmetic operations, such as A = B * C / D + E."
+              + System.lineSeparator()
+              + "When you are ready to evaluate your equation, click the Evaluate button. You can save"
+              + System.lineSeparator() + "the results of your evaluation to a file with the Save button."
+              + System.lineSeparator());
+      txt.setPadding(new Insets(10, 10, 10, 10));
+      txt.setFont(new Font(14));
+      Scene helpScene = new Scene(txt, 600, 200);
       helpWindow.setScene(helpScene);
-      helpWindow.show();
+      getWebAPI().openStageAsPopup(helpWindow);
     });
     Tooltip tipHelp = new Tooltip("Open an explanation for how to create a custom equation");
     Tooltip.install(btnHelp, tipHelp);
@@ -186,12 +182,13 @@ public class UIExpressionEvaluation extends JProApplication {
     Button btnAddVariable = new Button("Add Variable");
     btnAddVariable.setStyle("-fx-font-size: 16;");
     btnAddVariable.setOnAction(e -> {
-      HBox row = createBuildVariableRow(null, null, null, true);
+      HBox row = createBuildVariableRow(stackpane, null, null, null, true);
       if (row != null)
         boxBuildEquation.getChildren().add(row);
     });
     Tooltip tipAddVariable = new Tooltip("Define a new variable to include in your custom equation");
     Tooltip.install(btnAddVariable, tipAddVariable);
+    btnAddVariable.setPadding(new Insets(10, 15, 10, 10));
 
     Button btnClear = new Button("Clear");
     btnClear.setStyle("-fx-font-size: 16;");
@@ -199,6 +196,9 @@ public class UIExpressionEvaluation extends JProApplication {
       boxBuildEquation.getChildren().clear();
       createdVariables = 0;
       customVariables.clear();
+      tblVariables.getChildren().clear();
+      tblEvaluation.getChildren().clear();
+      lblEquation.setText("");
     });
     Tooltip tipClear = new Tooltip("Remove all of the variables you have defined");
     Tooltip.install(btnClear, tipClear);
@@ -280,7 +280,9 @@ public class UIExpressionEvaluation extends JProApplication {
     ScrollPane scrollPane = new ScrollPane(layout);
     scrollPane.setFitToHeight(true);
 
-    BorderPane root = new BorderPane(scrollPane);
+    stackpane.getChildren().add(scrollPane);
+
+    BorderPane root = new BorderPane();
     root.setPadding(new Insets(1));
     root.setCenter(layout);
 
@@ -370,6 +372,7 @@ public class UIExpressionEvaluation extends JProApplication {
     colName.setStyle("-fx-font-weight: bold; -fx-font-size: 16;");
     Label colType = new Label("Type");
     colType.setStyle("-fx-font-weight: bold; -fx-font-size: 16;");
+    colType.autosize();
     Label colValue = new Label("Value");
     colValue.setStyle("-fx-font-weight: bold; -fx-font-size: 16;");
     tblVariables.add(createCell(colName, "#556688", "#aabbdd", ""), 0, 0, 1, 1);
@@ -468,7 +471,7 @@ public class UIExpressionEvaluation extends JProApplication {
     }
   }
 
-  HBox createBuildVariableRow(GridPane gLayout, String name, String type, String value, boolean isNew) {
+  HBox createBuildVariableRow(StackPane spLayout, String name, String type, String value, boolean isNew) {
     if (type != null && type.startsWith("signed "))
       type = type.substring(7, type.length());
     HBox row = new HBox();
@@ -476,7 +479,7 @@ public class UIExpressionEvaluation extends JProApplication {
     final int idx = createdVariables;
     ++createdVariables;
 
-    TextField txtName = new TextField((name == null ? "var_name" : name));
+    TextField txtName = new TextField((name == null ? "" : name));
     txtName.textProperty().addListener(new ChangeListener<String>() {
       public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
         Variable var = customVariables.get(idx);
@@ -511,70 +514,63 @@ public class UIExpressionEvaluation extends JProApplication {
       }
     });
 
+    StackPane dialogSP = new StackPane();
     // add a button to delete the variable
     JFXButton btnXVariable = new JFXButton("X");
     btnXVariable.setButtonType(JFXButton.ButtonType.RAISED);
-    btnXVariable.setStyle("-fx-font-size: 14;");
     btnXVariable.setOnAction(e -> {
+      // getWebAPI().openStageAsPopup(createPopupStage(row, idx));
+      JFXDialog dialog = createPopupDialog(row, idx);
 
-      JFXDialogLayout dLayout = new JFXDialogLayout();
-      dLayout.setHeading(new Label("Variable Delete Dialog"));
-      dLayout.setBody(new Label("Are you sure you want to delete the variable " + customVariables.get(idx).name + "?"));
-
-      JFXButton yesButton = new JFXButton("Yes");
-      yesButton.setOnAction(event -> {
-        customVariables.remove(idx);
-        createdVariables--;
-        row.getChildren().clear();
-        boxBuildEquation.getChildren().remove(row);
-        dialog.close();
-      });
-
-      JFXButton noButton = new JFXButton("No");
-      noButton.setOnAction(event -> {
-        dialog.close();
-      });
-
-      dLayout.setActions(yesButton, noButton);
-      JFXDialog dialog = new JFXDialog(gLayout, dLayout, JFXDialog.DialogTransition.CENTER);
-
-      dialog.show();
-      // add a popup dialog to confirm yes/no
-      // ButtonType yesButton = new ButtonType("Yes", ButtonData.YES);
-      // ButtonType noButton = new ButtonType("No", ButtonData.YES);
-      // Dialog<ButtonType> dialog = new Dialog<>();
-      // dialog.setTitle("Variable Delete Dialog");
-      // dialog.setContentText("Are you sure you want to delete the variable " +
-      // customVariables.get(idx).name + "?");
-      // dialog.getDialogPane().getButtonTypes().add(yesButton);
-      // dialog.getDialogPane().getButtonTypes().add(noButton);
-      // boolean disabled = false; // computed based on content of text fields, for
-      // example
-      // dialog.getDialogPane().lookupButton(yesButton).setDisable(disabled);
-      // dialog.getDialogPane().lookupButton(noButton).setDisable(disabled);
-      // dialog.showAndWait().filter(response -> response.getText() ==
-      // "Yes").ifPresent(response -> {
-      // customVariables.remove(idx);
-      // createdVariables--;
-      // row.getChildren().clear();
-      // boxBuildEquation.getChildren().remove(row);
-      // });
+      dialog.setTransitionType(JFXDialog.DialogTransition.CENTER);
+      dialog.show(dialogSP);
     });
 
+    dialogSP.getChildren().add(btnXVariable);
     Tooltip tipXVariable = new Tooltip("Delete this variable");
     Tooltip.install(btnXVariable, tipXVariable);
 
-    row.getChildren().addAll(txtName, cboTypes, txtValue, btnXVariable);
+    row.getChildren().addAll(txtName, cboTypes, txtValue, dialogSP);
 
     if (isNew) {
       Variable var = new Variable();
-      var.name = "var_name";
-      var.value = "Enter Value";
+      var.name = "";
+      var.value = "";
       var.type = "int";
       customVariables.add(var);
     }
 
     return row;
+  }
+
+  JFXDialog createPopupDialog(HBox row, int idx) {
+
+    JFXDialog dialog = new JFXDialog();
+
+    JFXDialogLayout dlayout = new JFXDialogLayout();
+
+    dlayout.setHeading(new Label("Variable Delete Dialog"));
+    dlayout.setBody(new Label("Are you sure you want to delete this variable?"));
+
+    JFXButton yesButton = new JFXButton("Yes");
+    yesButton.setOnAction(event -> {
+      customVariables.remove(idx);
+      createdVariables--;
+      row.getChildren().clear();
+      boxBuildEquation.getChildren().remove(row);
+      dialog.close();
+    });
+
+    Button noButton = new Button("No");
+    noButton.setOnAction(event -> {
+      dialog.close();
+    });
+
+    dlayout.setActions(yesButton, noButton);
+
+    dialog.setContent(dlayout);
+
+    return dialog;
   }
 
   int getIndexOfCreatedVariable(String name) {
@@ -597,28 +593,19 @@ public class UIExpressionEvaluation extends JProApplication {
       String analysis = CExpr.processCodeFromString(filename, contents);
       if (toRead)
         parseEvaluationFromString(analysis);
-      // FileWriter fileWriter = new FileWriter(filename);
-      // fileWriter.write(contents);
-      // fileWriter.close();
-
-      // Process proc = Runtime.getRuntime().exec("java -jar ceval.jar " + filename);
-      // proc.waitFor();
-
-      // if (toRead)
-      // parseEvaluationFromFile(filename + ".vaccs.ascii");
     } catch (Exception e) {
       System.err.println("Exception while attempting to evaluate custom equation: " + e);
     }
   }
 
-  List<HBox> populateEquationEditor(GridPane layout) {
+  List<HBox> populateEquationEditor(StackPane spLayout) {
     createdVariables = 0;
     List<HBox> newVariableRows = new ArrayList<>();
 
     for (ExpressionEvaluation.VariableRecord record : ev.variableTable) {
       HBox row = new HBox();
 
-      newVariableRows.add(createBuildVariableRow(layout, record.name, record.type, record.value, false));
+      newVariableRows.add(createBuildVariableRow(spLayout, record.name, record.type, record.value, false));
     }
 
     return newVariableRows;
