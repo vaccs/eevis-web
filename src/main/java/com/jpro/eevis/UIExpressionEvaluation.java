@@ -180,6 +180,7 @@ public class UIExpressionEvaluation extends JProApplication {
       tblVariables.getChildren().clear();
       tblEvaluation.getChildren().clear();
       lblEquation.setText("");
+      firstEquationClick = true;
     });
     Tooltip tipClear = new Tooltip("Remove all of the variables you have defined");
     Tooltip.install(btnClear, tipClear);
@@ -201,24 +202,40 @@ public class UIExpressionEvaluation extends JProApplication {
     btnSave.setPadding(new Insets(10, 15, 10, 10));
     btnSave.setOnAction(e -> {
       // create javaScript to open a file chooser and save a file
-      String jsFileSaveScript = "";
-      File file = null;// new File(fileSaveHandler.getSelectedFile());
-      if (file != null) {
-        String absolutePath = file.getAbsolutePath();
-        saveFile(absolutePath);
+      String contents = "";
+      for (Variable var : customVariables) {
+        contents += (var.type + " " + var.name + " = " + (var.value.equals("<NOVALUE>") ? "0" : var.value) + ";"
+            + System.lineSeparator());
       }
+      contents += (txtEquation.getText() + ";" + System.lineSeparator());
+      String jsFileSaveScript = "function download(filename, text) {" + 
+                                "var pom = document.createElement('a');"+
+                                "pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));"+
+                                "pom.setAttribute('download', filename);"+
+                                "if (document.createEvent) {"+
+                                "var event = document.createEvent('MouseEvents');"+
+                                "event.initEvent('click', true, true);"+
+                                "pom.dispatchEvent(event);"+
+                                "}"+
+                                "else {"+
+                                "pom.click();"+
+                                "}"+
+                                "}"+
+                                "download('customeqn.eevis','"+contents+"')";
+      getWebAPI().executeScript(jsFileSaveScript);
     });
     Tooltip tipSave = new Tooltip("Save your custom equation and analysis results to a file");
     Tooltip.install(btnSave, tipSave);
 
     txtEquation = new TextField("Enter Equation (e.g. A = B + C)");
+    txtEquation.setStyle("-fx-font-weight: bold; -fx-font-size: 16;");
     txtEquation.setOnMouseClicked(event -> {
       if (firstEquationClick) {
         firstEquationClick = false;
         txtEquation.clear();
       }
     });
-    txtEquation.setPrefWidth(300.0);
+    txtEquation.setPrefWidth(500.0);
 
     buildEquationContainer.setPadding(new Insets(10, 10, 10, 10));
     buildEquationContainer.add(lblBuild1, 0, 0, 3, 1);
