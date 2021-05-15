@@ -17,6 +17,7 @@ import org.vaccs.eevis.driver.CExpr;
 import org.vaccs.eevis.util.FileHandler;
 
 import com.jpro.webapi.JProApplication;
+import com.jpro.webapi.HTMLView;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
@@ -47,6 +48,9 @@ public class UIExpressionEvaluation extends JProApplication {
   private VBox boxBuildEquation = new VBox();
   private GridPane buildEquationContainer = new GridPane();
   private TextField txtEquation;
+  private boolean firstEquationClick = true;
+  private boolean firstVariableClick = true;
+  private boolean firstValueClick = true;
 
   public static void main(String[] args) {
     // redirect stderr
@@ -69,7 +73,7 @@ public class UIExpressionEvaluation extends JProApplication {
 
     StackPane stackpane = new StackPane();
 
-    primaryStage.setTitle("Expression Evaluation Vis");
+    primaryStage.setTitle("Expression Evaluation Visualization");
 
     Image image = new Image("file:assets/ConversionRules.png");
     ImageView imv = new ImageView();
@@ -85,45 +89,22 @@ public class UIExpressionEvaluation extends JProApplication {
 
     GridPane layout = new GridPane();
 
-    Button btnLoad = new Button("Use Equation");
+    StackPane loadEquationSP = new StackPane();
+    // add a button to load an equation
+    Button btnLoad = new Button("Load");
     btnLoad.setTextAlignment(TextAlignment.CENTER);
-    btnLoad.setDisable(true); // this is disabled until the file is completely loaded
-    btnLoad.setStyle("-fx-font-size: 14;");
+    btnLoad.setStyle("-fx-font-size: 16;");
     btnLoad.setPadding(new Insets(10, 15, 10, 10));
     btnLoad.setOnAction(e -> {
-      try {
-        getWebAPI().downloadURL(fileLoadHandler.fileHandler.getUploadedFile().toURI().toURL());
-      } catch (MalformedURLException e1) {
-        e1.printStackTrace();
-      }
-      File file = fileLoadHandler.fileHandler.getUploadedFile();
-      if (file != null) {
-        String absolutePath = file.getAbsolutePath();
-        try {
+      JFXDialog dialog = createLoadEquationDialog(stackpane);
 
-          parseEvaluationFromString(CExpr.processCodeFromString("customequation.eevis", loadFile(absolutePath)));
-          boxBuildEquation.getChildren().clear();
-          List<HBox> newVariableRows = populateEquationEditor(stackpane);
-          for (HBox h : newVariableRows)
-            boxBuildEquation.getChildren().add(h);
-        } catch (Exception ex) {
-          System.err.println(ex);
-        }
-      }
+      dialog.setTransitionType(JFXDialog.DialogTransition.CENTER);
+      dialog.show(loadEquationSP);
     });
 
-    fileLoadHandler.fileHandler.progressProperty().addListener((obs, oldV, newV) -> {
-      if (newV.doubleValue() == 1.0) {
-        btnLoad.setDisable(false);
-      }
-    });
+    loadEquationSP.getChildren().add(btnLoad);
 
-    VBox loadEquationBox = new VBox(1.0, fileLoadHandler, btnLoad);
-    loadEquationBox.setSpacing(50);
-    loadEquationBox.setAlignment(Pos.CENTER);
-
-    Tooltip tipLoad = new Tooltip("Select an equation analysis file to load");
-    Tooltip.install(loadEquationBox, tipLoad);
+   
 
     // lblEquation.setPadding(new Insets(10, 10, 10, 10));
 
@@ -135,12 +116,17 @@ public class UIExpressionEvaluation extends JProApplication {
     // tblEvaluation.setVgap(8);
     tblEvaluation.setPadding(new Insets(10, 10, 10, 10));
 
+    Label eqnLable = new Label("Equation: ");
+    eqnLable.setStyle("-fx-font-size: 18;");
     lblEquation = new Label("-----");
     lblEquation.setStyle("-fx-font-size: 18;");
-    GridPane subLayout = new GridPane();
-    subLayout.add(createCell(lblEquation, "#000000", "#ffffff", ""), 0, 0, 1, 1);
-    subLayout.add(loadEquationBox, 0, 1, 1, 1);
-    subLayout.setPadding(new Insets(10, 10, 10, 10));
+    lblEquation.setPrefWidth(300.0);
+
+    HBox msgHBox = new HBox(10.0,eqnLable,createCell(lblEquation, "#000000", "#ffffff", ""));
+    //subLayout.add(msgLabel,1,0,1,1);
+    //subLayout.add(createCell(lblEquation, "#000000", "#ffffff", ""), 0, 1, 1, 1);
+    //subLayout.add(loadEquationSP, 0, 1, 1, 1);
+    msgHBox.setPadding(new Insets(10, 10, 10, 10));
 
     boxBuildEquation = new VBox();
     Label lblBuild1 = new Label("Create Custom Equation");
@@ -148,30 +134,24 @@ public class UIExpressionEvaluation extends JProApplication {
 
     Button btnHelp = new Button("Help");
     btnHelp.setStyle("-fx-font-size: 16;");
+    btnHelp.setPadding(new Insets(10, 15, 10, 10));
     btnHelp.setOnAction(e -> {
       final Stage helpWindow = new Stage();
       helpWindow.initModality(Modality.WINDOW_MODAL);
-      Label txt = new Label(
-          "To create your own equation, first define the variables that will be used in" + System.lineSeparator()
-              + "the equation. To define a variable, click the Add Variable button. The text box on the"
-              + System.lineSeparator()
-              + "left is where you can give the variable any unique, valid C variable name. You can use the"
-              + System.lineSeparator()
-              + "drop-down box to set the variable's type and the text field to enter its initial value."
-              + System.lineSeparator()
-              + "All variables require an initial value, even the one being assigned to. You can click the"
-              + System.lineSeparator()
-              + "Clear button to remove all variables you have defined. Then, enter your equation in the"
-              + System.lineSeparator()
-              + "provided field at the top. The equation must be a single line of valid C that consists of"
-              + System.lineSeparator()
-              + "the variables you defined and valid arithmetic operations, such as A = B * C / D + E."
-              + System.lineSeparator()
-              + "When you are ready to evaluate your equation, click the Evaluate button. You can save"
-              + System.lineSeparator() + "the results of your evaluation to a file with the Save button."
-              + System.lineSeparator());
-      txt.setPadding(new Insets(10, 10, 10, 10));
-      txt.setFont(new Font(14));
+    
+      HTMLView txt = new HTMLView("<html> <head> <title> EEVis Help Window </title> </head> <body> <p>"+
+                                  "To create your own equation, please use the following steps: <ol>" + 
+                                  "<li> Define the variables that will be used in the equation as follows:" +
+                                  "<ol> <li>Click the <i>Add Variable</i> button. This create a new row for the variable.</li>" +
+                                  "<li>Enter the variable name in the text box on the left.</li>" +
+                                  "<li>Use the drop-down box in the middle to assign the variable's type.</li>" +
+                                  "<li>Enter an initial value in the text box on the right. An initial value is <b>required</b>.</li>" +
+                                  "</ol> </li> <li> Enter your equation in the top text box. If you have made an errors, the message "+
+                                  "<i>Parse Error</i> appears in the information box above</li>"+
+                                  "<li> To evaluation your equation, press the <i>Evaluate</i> button.</li>"+
+                                  " <li> To start over, press the <i>Clear</i> button. This clears the equation,"+
+                                  " variables and the evaluation of the equation.</li>"+
+                                  " <li> To save your equation, press the <i>Save</i> button.</li> </ol> </p> </body> </html>");
       Scene helpScene = new Scene(txt, 600, 200);
       helpWindow.setScene(helpScene);
       getWebAPI().openStageAsPopup(helpWindow);
@@ -192,6 +172,7 @@ public class UIExpressionEvaluation extends JProApplication {
 
     Button btnClear = new Button("Clear");
     btnClear.setStyle("-fx-font-size: 16;");
+    btnClear.setPadding(new Insets(10, 15, 10, 10));
     btnClear.setOnAction(e -> {
       boxBuildEquation.getChildren().clear();
       createdVariables = 0;
@@ -205,6 +186,7 @@ public class UIExpressionEvaluation extends JProApplication {
 
     Button btnEvaluate = new Button("Evaluate");
     btnEvaluate.setStyle("-fx-font-size: 16;");
+    btnEvaluate.setPadding(new Insets(10, 15, 10, 10));
     btnEvaluate.setOnAction(e -> {
       runCustomAnalysis("customequation.eevis", true);
     });
@@ -216,7 +198,10 @@ public class UIExpressionEvaluation extends JProApplication {
 
     Button btnSave = new Button("Save");
     btnSave.setStyle("-fx-font-size: 16;");
+    btnSave.setPadding(new Insets(10, 15, 10, 10));
     btnSave.setOnAction(e -> {
+      // create javaScript to open a file chooser and save a file
+      String jsFileSaveScript = "";
       File file = null;// new File(fileSaveHandler.getSelectedFile());
       if (file != null) {
         String absolutePath = file.getAbsolutePath();
@@ -227,14 +212,22 @@ public class UIExpressionEvaluation extends JProApplication {
     Tooltip.install(btnSave, tipSave);
 
     txtEquation = new TextField("Enter Equation (e.g. A = B + C)");
+    txtEquation.setOnMouseClicked(event -> {
+      if (firstEquationClick) {
+        firstEquationClick = false;
+        txtEquation.clear();
+      }
+    });
+    txtEquation.setPrefWidth(300.0);
 
     buildEquationContainer.setPadding(new Insets(10, 10, 10, 10));
     buildEquationContainer.add(lblBuild1, 0, 0, 3, 1);
-    buildEquationContainer.add(btnHelp, 3, 0, 1, 1);
+    buildEquationContainer.add(btnHelp, 4, 0, 1, 1);
     buildEquationContainer.add(btnAddVariable, 0, 1, 1, 1);
     buildEquationContainer.add(btnClear, 1, 1, 1, 1);
     buildEquationContainer.add(btnEvaluate, 2, 1, 1, 1);
     buildEquationContainer.add(btnSave, 3, 1, 1, 1);
+    buildEquationContainer.add(loadEquationSP, 4, 1, 1, 1);
     buildEquationContainer.add(txtEquation, 0, 2, 4, 1);
     buildEquationContainer.add(boxBuildEquation, 0, 3, 4, 5);
 
@@ -255,7 +248,7 @@ public class UIExpressionEvaluation extends JProApplication {
      * layout.getColumnConstraints().addAll(leftCol, rightCol); /*
      */
 
-    layout.add(subLayout, 0, 0, 1, 1);
+    layout.add(msgHBox, 0, 0, 1, 1);
     layout.add(imv, 1, 0, 1, 4);
     layout.add(tblVariables, 0, 1, 1, 1);
     layout.add(buildEquationContainer, 0, 2, 1, 1);
@@ -479,7 +472,11 @@ public class UIExpressionEvaluation extends JProApplication {
     final int idx = createdVariables;
     ++createdVariables;
 
-    TextField txtName = new TextField((name == null ? "" : name));
+    TextField txtName = new TextField((name == null ? "Enter Variable" : name));
+    txtName.setOnMouseClicked(event -> {
+      if (txtName.getText().equals("Enter Variable"))
+        txtName.clear();
+    });
     txtName.textProperty().addListener(new ChangeListener<String>() {
       public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
         Variable var = customVariables.get(idx);
@@ -505,6 +502,10 @@ public class UIExpressionEvaluation extends JProApplication {
     });
 
     TextField txtValue = new TextField((value == null ? "Enter Value" : value));
+    txtValue.setOnMouseClicked(event -> {
+      if (txtValue.getText().equals("Enter Value"))
+        txtValue.clear();
+    });
     txtValue.textProperty().addListener(new ChangeListener<String>() {
       public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
         String val = convertNumber(newValue);
@@ -519,7 +520,6 @@ public class UIExpressionEvaluation extends JProApplication {
     JFXButton btnXVariable = new JFXButton("X");
     btnXVariable.setButtonType(JFXButton.ButtonType.RAISED);
     btnXVariable.setOnAction(e -> {
-      // getWebAPI().openStageAsPopup(createPopupStage(row, idx));
       JFXDialog dialog = createPopupDialog(row, idx);
 
       dialog.setTransitionType(JFXDialog.DialogTransition.CENTER);
@@ -567,6 +567,78 @@ public class UIExpressionEvaluation extends JProApplication {
     });
 
     dlayout.setActions(yesButton, noButton);
+
+    dialog.setContent(dlayout);
+
+    return dialog;
+  }
+
+  JFXDialog createSaveEquationDialog(StackPane stackpane) {
+    JFXDialog dialog = new JFXDialog();
+
+    return dialog;
+  }
+
+  JFXDialog createLoadEquationDialog(StackPane stackpane) {
+
+    JFXDialog dialog = new JFXDialog();
+
+    JFXDialogLayout dlayout = new JFXDialogLayout();
+
+    dlayout.setHeading(new Label("Load or Drag-and-Drop An Equation "));
+
+    JFXButton btnUseEquation = new JFXButton("Use Equation");
+    btnUseEquation.setTextAlignment(TextAlignment.CENTER);
+    btnUseEquation.setDisable(true); // this is disabled until the file is completely loaded
+    btnUseEquation.setStyle("-fx-font-size: 14;");
+    btnUseEquation.setPadding(new Insets(10, 15, 10, 10));
+    btnUseEquation.setOnAction(e -> {
+      try {
+        getWebAPI().downloadURL(fileLoadHandler.fileHandler.getUploadedFile().toURI().toURL());
+      } catch (MalformedURLException e1) {
+        e1.printStackTrace();
+      }
+      File file = fileLoadHandler.fileHandler.getUploadedFile();
+      if (file != null) {
+        String absolutePath = file.getAbsolutePath();
+        try {
+
+          parseEvaluationFromString(CExpr.processCodeFromString("customequation.eevis", loadFile(absolutePath)));
+          boxBuildEquation.getChildren().clear();
+          List<HBox> newVariableRows = populateEquationEditor(stackpane);
+          for (HBox h : newVariableRows)
+            boxBuildEquation.getChildren().add(h);
+        } catch (Exception ex) {
+          System.err.println(ex);
+        }
+      }
+      dialog.close();
+    });
+
+    JFXButton btnClose = new JFXButton("Close Dialog");
+    btnClose.setTextAlignment(TextAlignment.CENTER);
+    btnClose.setStyle("-fx-font-size: 14;");
+    btnClose.setPadding(new Insets(10, 15, 10, 10));
+    btnClose.setOnAction(e -> {
+      dialog.close();
+    });
+
+    fileLoadHandler.fileHandler.progressProperty().addListener((obs, oldV, newV) -> {
+      if (newV.doubleValue() == 1.0) {
+        btnUseEquation.setDisable(false);
+      }
+    });
+
+    HBox buttonBox = new HBox(btnUseEquation,btnClose);
+
+    VBox loadEquationBox = new VBox(1.0, fileLoadHandler, buttonBox);
+    loadEquationBox.setSpacing(50);
+    loadEquationBox.setAlignment(Pos.CENTER);
+
+    Tooltip tipLoad = new Tooltip("Select an equation analysis file to load");
+    Tooltip.install(loadEquationBox, tipLoad);
+
+    dlayout.setActions(loadEquationBox);
 
     dialog.setContent(dlayout);
 
