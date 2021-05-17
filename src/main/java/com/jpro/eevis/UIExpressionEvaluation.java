@@ -8,7 +8,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringReader;
-import java.lang.management.ManagementFactory;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,15 +21,12 @@ import com.jpro.webapi.HTMLView;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
-import com.jfoenix.controls.JFXPopup;
 
 import javafx.beans.value.*;
 import javafx.collections.*;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
@@ -49,8 +45,6 @@ public class UIExpressionEvaluation extends JProApplication {
   private GridPane buildEquationContainer = new GridPane();
   private TextField txtEquation;
   private boolean firstEquationClick = true;
-  private boolean firstVariableClick = true;
-  private boolean firstValueClick = true;
 
   public static void main(String[] args) {
     // redirect stderr
@@ -81,9 +75,6 @@ public class UIExpressionEvaluation extends JProApplication {
     imv.setPreserveRatio(true);
     imv.setSmooth(true);
     imv.setCache(true);
-    // imv.setFitWidth(100);
-
-    // uploadLabel.getStyleClass().add("file-handler");
 
     fileLoadHandler = new FileHandler(getWebAPI(), "Click, or Drag-and-Drop Equation", true);
 
@@ -104,16 +95,10 @@ public class UIExpressionEvaluation extends JProApplication {
 
     loadEquationSP.getChildren().add(btnLoad);
 
-   
-
     // lblEquation.setPadding(new Insets(10, 10, 10, 10));
 
-    // tblVariables.setHgap(12);
-    // tblVariables.setVgap(8);
     tblVariables.setPadding(new Insets(10, 10, 10, 10));
 
-    // tblEvaluation.setHgap(12);
-    // tblEvaluation.setVgap(8);
     tblEvaluation.setPadding(new Insets(10, 10, 10, 10));
 
     Label eqnLable = new Label("Equation: ");
@@ -122,10 +107,7 @@ public class UIExpressionEvaluation extends JProApplication {
     lblEquation.setStyle("-fx-font-size: 18;");
     lblEquation.setPrefWidth(300.0);
 
-    HBox msgHBox = new HBox(10.0,eqnLable,createCell(lblEquation, "#000000", "#ffffff", ""));
-    //subLayout.add(msgLabel,1,0,1,1);
-    //subLayout.add(createCell(lblEquation, "#000000", "#ffffff", ""), 0, 1, 1, 1);
-    //subLayout.add(loadEquationSP, 0, 1, 1, 1);
+    HBox msgHBox = new HBox(10.0, eqnLable, createCell(lblEquation, "#000000", "#ffffff", ""));
     msgHBox.setPadding(new Insets(10, 10, 10, 10));
 
     boxBuildEquation = new VBox();
@@ -138,20 +120,20 @@ public class UIExpressionEvaluation extends JProApplication {
     btnHelp.setOnAction(e -> {
       final Stage helpWindow = new Stage();
       helpWindow.initModality(Modality.WINDOW_MODAL);
-    
-      HTMLView txt = new HTMLView("<html> <head> <title> EEVis Help Window </title> </head> <body> <p>"+
-                                  "To create your own equation, please use the following steps: <ol>" + 
-                                  "<li> Define the variables that will be used in the equation as follows:" +
-                                  "<ol> <li>Click the <i>Add Variable</i> button. This create a new row for the variable.</li>" +
-                                  "<li>Enter the variable name in the text box on the left.</li>" +
-                                  "<li>Use the drop-down box in the middle to assign the variable's type.</li>" +
-                                  "<li>Enter an initial value in the text box on the right. An initial value is <b>required</b>.</li>" +
-                                  "</ol> </li> <li> Enter your equation in the top text box. If you have made an errors, the message "+
-                                  "<i>Parse Error</i> appears in the information box above</li>"+
-                                  "<li> To evaluation your equation, press the <i>Evaluate</i> button.</li>"+
-                                  " <li> To start over, press the <i>Clear</i> button. This clears the equation,"+
-                                  " variables and the evaluation of the equation.</li>"+
-                                  " <li> To save your equation, press the <i>Save</i> button.</li> </ol> </p> </body> </html>");
+
+      HTMLView txt = new HTMLView("<html> <head> <title> EEVis Help Window </title> </head> <body> <p>"
+          + "To create your own equation, please use the following steps: <ol>"
+          + "<li> Define the variables that will be used in the equation as follows:"
+          + "<ol> <li>Click the <i>Add Variable</i> button. This create a new row for the variable.</li>"
+          + "<li>Enter the variable name in the text box on the left.</li>"
+          + "<li>Use the drop-down box in the middle to assign the variable's type.</li>"
+          + "<li>Enter an initial value in the text box on the right. An initial value is <b>required</b>.</li>"
+          + "</ol> </li> <li> Enter your equation in the top text box. If you have made an errors, the message "
+          + "<i>Parse Error</i> appears in the information box above</li>"
+          + "<li> To evaluation your equation, press the <i>Evaluate</i> button.</li>"
+          + " <li> To start over, press the <i>Clear</i> button. This clears the equation,"
+          + " variables and the evaluation of the equation.</li>"
+          + " <li> To save your equation, press the <i>Save</i> button.</li> </ol> </p> </body> </html>");
       Scene helpScene = new Scene(txt, 600, 200);
       helpWindow.setScene(helpScene);
       getWebAPI().openStageAsPopup(helpWindow);
@@ -194,9 +176,6 @@ public class UIExpressionEvaluation extends JProApplication {
     Tooltip tipEvaluate = new Tooltip("Perform and display analysis of the custom equation you have set up");
     Tooltip.install(btnEvaluate, tipEvaluate);
 
-    // fileSaveHandler = webAPI.makeFileUploadNode(uploadLabel);
-    // fileSaveHandler.setSelectFileOnClick(true);
-
     Button btnSave = new Button("Save");
     btnSave.setStyle("-fx-font-size: 16;");
     btnSave.setPadding(new Insets(10, 15, 10, 10));
@@ -204,24 +183,15 @@ public class UIExpressionEvaluation extends JProApplication {
       // create javaScript to open a file chooser and save a file
       String contents = "";
       for (Variable var : customVariables) {
-        contents += (var.type + " " + var.name + " = " + (var.value.equals("<NOVALUE>") ? "0" : var.value) + ";"
-            + System.lineSeparator());
+        contents += (var.type + " " + var.name + " = " + (var.value.equals("<NOVALUE>") ? "0" : var.value) + ";" + " ");
       }
-      contents += (txtEquation.getText() + ";" + System.lineSeparator());
-      String jsFileSaveScript = "function download(filename, text) {" + 
-                                "var pom = document.createElement('a');"+
-                                "pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));"+
-                                "pom.setAttribute('download', filename);"+
-                                "if (document.createEvent) {"+
-                                "var event = document.createEvent('MouseEvents');"+
-                                "event.initEvent('click', true, true);"+
-                                "pom.dispatchEvent(event);"+
-                                "}"+
-                                "else {"+
-                                "pom.click();"+
-                                "}"+
-                                "}"+
-                                "download('customeqn.eevis','"+contents+"')";
+      contents += (txtEquation.getText() + ";");
+      String jsFileSaveScript = "function download(filename, text) {" + "var pom = document.createElement('a');"
+          + "pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));"
+          + "pom.setAttribute('download', filename);" + "if (document.createEvent) {"
+          + "var event = document.createEvent('MouseEvents');" + "event.initEvent('click', true, true);"
+          + "pom.dispatchEvent(event);" + "}" + "else {" + "pom.click();" + "}" + "}" + "download('customeqn.eevis','"
+          + contents + "')";
       getWebAPI().executeScript(jsFileSaveScript);
     });
     Tooltip tipSave = new Tooltip("Save your custom equation and analysis results to a file");
@@ -238,54 +208,29 @@ public class UIExpressionEvaluation extends JProApplication {
     txtEquation.setPrefWidth(500.0);
 
     buildEquationContainer.setPadding(new Insets(10, 10, 10, 10));
-    buildEquationContainer.add(lblBuild1, 0, 0, 3, 1);
-    buildEquationContainer.add(btnHelp, 4, 0, 1, 1);
+    buildEquationContainer.add(lblBuild1, 0, 0, 6, 1);
+    buildEquationContainer.add(btnHelp, 5, 1, 1, 1);
     buildEquationContainer.add(btnAddVariable, 0, 1, 1, 1);
-    buildEquationContainer.add(btnClear, 1, 1, 1, 1);
-    buildEquationContainer.add(btnEvaluate, 2, 1, 1, 1);
+    buildEquationContainer.add(btnEvaluate, 1, 1, 1, 1);
+    buildEquationContainer.add(btnClear, 2, 1, 1, 1);
     buildEquationContainer.add(btnSave, 3, 1, 1, 1);
     buildEquationContainer.add(loadEquationSP, 4, 1, 1, 1);
-    buildEquationContainer.add(txtEquation, 0, 2, 4, 1);
-    buildEquationContainer.add(boxBuildEquation, 0, 3, 4, 5);
+    buildEquationContainer.add(txtEquation, 0, 2, 6, 1);
+    buildEquationContainer.add(boxBuildEquation, 0, 3, 6, 6);
 
-    // parseEvaluation("examples/test1.c.vaccs.ascii");
     createdVariables = 0;
-    // boxBuildEquation.getChildren().clear();
-    // List<HBox> newVariableRows = populateEquationEditor();
-    // for (HBox h : newVariableRows) boxBuildEquation.getChildren().add(h);
-
-    // display
-    // /////////////////////////////////////////////////////////////////////////////////////
-
-    // no effect?
-    /*
-     * ColumnConstraints leftCol = new ColumnConstraints();
-     * leftCol.setPercentWidth(40); ColumnConstraints rightCol = new
-     * ColumnConstraints(); rightCol.setPercentWidth(60);
-     * layout.getColumnConstraints().addAll(leftCol, rightCol); /*
-     */
 
     layout.add(msgHBox, 0, 0, 1, 1);
     layout.add(imv, 1, 0, 1, 4);
     layout.add(tblVariables, 0, 1, 1, 1);
     layout.add(buildEquationContainer, 0, 2, 1, 1);
-    layout.add(tblEvaluation, 0, 4, 2, 1);
+    layout.add(tblEvaluation, 0, 3, 1, 1);
 
     primaryStage.widthProperty().addListener(new ChangeListener<Number>() {
       public void changed(ObservableValue<? extends Number> obs, Number oldWidth, Number newWidth) {
         imv.setFitWidth(newWidth.doubleValue() / 1.75);
       }
     });
-    // imv.fitWidthProperty().bind(primaryStage.widthProperty());
-
-    // layout.setMinWidth(1000);
-    // layout.setMinHeight(500);
-
-    // root.minWidth(1000);
-    // root.minHeight(500);
-
-    // primaryStage.setMinWidth(1000);
-    // primaryStage.setMinHeight(500);
 
     ScrollPane scrollPane = new ScrollPane(layout);
     scrollPane.setFitToHeight(true);
@@ -294,7 +239,7 @@ public class UIExpressionEvaluation extends JProApplication {
 
     BorderPane root = new BorderPane();
     root.setPadding(new Insets(1));
-    root.setCenter(layout);
+    root.setCenter(stackpane);
 
     Scene scene = new Scene(root, 500, 500);
     root.getStylesheets().add(getClass().getResource("/com/jpro/hellojpro/css/filehandler.css").toExternalForm());
@@ -316,24 +261,6 @@ public class UIExpressionEvaluation extends JProApplication {
     }
 
     return input;
-  }
-
-  private void saveFile(String absolutePath) {
-    try {
-      String contents = "";
-      for (Variable var : customVariables) {
-        contents += (var.type + " " + var.name + " = " + (var.value.equals("<NOVALUE>") ? "0" : var.value) + ";"
-            + System.lineSeparator());
-      }
-      contents += (txtEquation.getText() + ";" + System.lineSeparator());
-
-      FileWriter fileWriter = new FileWriter(absolutePath);
-      fileWriter.write(contents);
-      fileWriter.close();
-
-    } catch (Exception e) {
-      System.err.println("Exception while attempting to save custom equation: " + e);
-    }
   }
 
   void parseEvaluation(BufferedReader reader) throws IOException {
@@ -452,6 +379,7 @@ public class UIExpressionEvaluation extends JProApplication {
       tblEvaluation.add(createCell(rowValues, "#558866", "#ccffdd", ""), 5, row, 1, 1);
       ++row;
     }
+
   }
 
   StackPane createCell(Label label, String borderColor, String bgColor, String otherCss) {
@@ -459,7 +387,7 @@ public class UIExpressionEvaluation extends JProApplication {
     cell.getChildren().add(label);
     cell.setStyle("-fx-background-color: " + borderColor + ", " + bgColor + ";" + "-fx-background-insets: 0, 1 1 1 1;"
         + otherCss + ";");
-    cell.setPadding(new Insets(5, 5, 5, 5));
+    cell.setPadding(new Insets(10, 15, 10, 10));
     return cell;
   }
 
@@ -646,7 +574,7 @@ public class UIExpressionEvaluation extends JProApplication {
       }
     });
 
-    HBox buttonBox = new HBox(btnUseEquation,btnClose);
+    HBox buttonBox = new HBox(btnUseEquation, btnClose);
 
     VBox loadEquationBox = new VBox(1.0, fileLoadHandler, buttonBox);
     loadEquationBox.setSpacing(50);

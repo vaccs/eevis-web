@@ -5,3 +5,4 @@ errorlog.txt
 logs/
 RUNNING_PID
 build/
+tmp/
