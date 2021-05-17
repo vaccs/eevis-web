@@ -1,3 +1,8 @@
 *.class
 eevis.jar
 errorlog.txt
+.gradle/
+logs/
+RUNNING_PID
+build/
+tmp/
