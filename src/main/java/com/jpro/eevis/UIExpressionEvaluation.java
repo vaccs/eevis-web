@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringReader;
@@ -12,25 +11,38 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.vaccs.eevis.driver.CExpr;
-import org.vaccs.eevis.util.FileHandler;
-
-import com.jpro.webapi.JProApplication;
-import com.jpro.webapi.HTMLView;
-
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
+import com.jpro.webapi.HTMLView;
+import com.jpro.webapi.JProApplication;
 
-import javafx.beans.value.*;
-import javafx.collections.*;
-import javafx.geometry.*;
-import javafx.scene.*;
-import javafx.scene.control.*;
-import javafx.scene.image.*;
-import javafx.scene.layout.*;
-import javafx.scene.text.*;
-import javafx.stage.*;
+import org.vaccs.eevis.driver.CExpr;
+import org.vaccs.eevis.util.FileHandler;
+
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 public class UIExpressionEvaluation extends JProApplication {
 
@@ -538,11 +550,7 @@ public class UIExpressionEvaluation extends JProApplication {
     btnUseEquation.setStyle("-fx-font-size: 14;");
     btnUseEquation.setPadding(new Insets(10, 15, 10, 10));
     btnUseEquation.setOnAction(e -> {
-      try {
-        getWebAPI().downloadURL(fileLoadHandler.fileHandler.getUploadedFile().toURI().toURL());
-      } catch (MalformedURLException e1) {
-        e1.printStackTrace();
-      }
+     
       File file = fileLoadHandler.fileHandler.getUploadedFile();
       if (file != null) {
         String absolutePath = file.getAbsolutePath();

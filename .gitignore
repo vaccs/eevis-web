@@ -6,3 +6,5 @@ logs/
 RUNNING_PID
 build/
 tmp/
+.classpath
+.settings/
