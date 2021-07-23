@@ -6,6 +6,12 @@ import javafx.scene.control.Label;
 public class FileHandler extends Label {
     public WebAPI.FileUploader fileHandler = null;
 
+    public FileHandler (WebAPI webAPI) {
+
+        fileHandler = webAPI.makeFileUploadNode(this);
+
+    }
+
     public FileHandler(WebAPI webAPI, String text, boolean drop) {
         setText(text);
         getStyleClass().add("file-handler");
