@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,7 +82,8 @@ public class UIExpressionEvaluation extends JProApplication {
 
     primaryStage.setTitle("Expression Evaluation Visualization");
 
-    Image image = new Image("file:assets/ConversionRules.png");
+    //URL imageURL = this.getClass().getResource("org/vaccs/eevis/assets/ConversionRules.png");
+    Image image = new Image(getClass().getResource("/org/eevis/img/ConversionRules.png").toString());
     ImageView imv = new ImageView();
     imv.setImage(image);
     imv.setPreserveRatio(true);
@@ -113,7 +115,7 @@ public class UIExpressionEvaluation extends JProApplication {
 
     tblEvaluation.setPadding(new Insets(10, 10, 10, 10));
 
-    Label eqnLable = new Label("Equation: ");
+    Label eqnLable = new Label("Message: ");
     eqnLable.setStyle("-fx-font-size: 18;");
     lblEquation = new Label("-----");
     lblEquation.setStyle("-fx-font-size: 18;");
@@ -209,7 +211,7 @@ public class UIExpressionEvaluation extends JProApplication {
     Tooltip tipSave = new Tooltip("Save your custom equation and analysis results to a file");
     Tooltip.install(btnSave, tipSave);
 
-    txtEquation = new TextField("Enter Equation (e.g. A = B + C)");
+    txtEquation = new TextField("Enter Assignment Statement (e.g. A = B + C)");
     txtEquation.setStyle("-fx-font-weight: bold; -fx-font-size: 16;");
     txtEquation.setOnMouseClicked(event -> {
       if (firstEquationClick) {
