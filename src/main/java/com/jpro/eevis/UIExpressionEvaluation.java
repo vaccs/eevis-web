@@ -125,7 +125,7 @@ public class UIExpressionEvaluation extends JProApplication {
     msgHBox.setPadding(new Insets(10, 10, 10, 10));
 
     boxBuildEquation = new VBox();
-    Label lblBuild1 = new Label("Create Custom Equation");
+    Label lblBuild1 = new Label("Create Custom Assignment Statement");
     lblBuild1.setStyle("-fx-font-size: 16; -fx-font-weight: bold;");
 
     Button btnHelp = new Button("Help");
